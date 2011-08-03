@@ -3,7 +3,6 @@ require 'rspec'
 
 require 'yajl'
 require 'tilt'
-require 'ruby-debug'
 
 $:.unshift(File.dirname(File.expand_path(__FILE__)))
 
