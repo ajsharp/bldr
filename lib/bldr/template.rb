@@ -21,10 +21,6 @@ module Bldr
       data.to_s
     end
 
-    private
-      def evaluate_source(scope, locals, &block)
-        super(scope, locals, &block)#.render!
-      end
   end
 
   Tilt.register 'bldr', Bldr::Template
