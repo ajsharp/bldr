@@ -14,6 +14,12 @@ Dir['spec/models/*'].each { |f| require File.expand_path(f) }
 RSpec.configure do |c|
   c.include Bldr
 
+  # Parse some json and return a ruby object
+  def parse(str)
+    Yajl::Parser.parse(str)
+  end
+
+  # Jsonify a ruby object
   def jsonify(hash)
     Yajl::Encoder.encode(hash)
   end

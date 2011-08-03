@@ -117,8 +117,20 @@ describe "Node#render!" do
 end
 
 describe "Node#object" do
-  it "returns nil"
-  it "evaluates the block stored inside"
+  it "evaluates the block and returns json" do
+    node = Node.new
+    result = node.object(:dude => Person.new("alex")) do
+      attributes :name
+
+      object(:bro => Person.new("john")) do
+        attributes :name
+      end
+    end
+
+    result.should == jsonify({
+      :dude => {:name => 'alex', :bro => {:name => 'john'}}
+    })
+  end
 end
 
 describe "Node#to_json" do

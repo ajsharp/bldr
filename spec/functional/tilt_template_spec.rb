@@ -10,7 +10,7 @@ describe "evaluating a tilt template" do
     alex.name = 'alex'
 
     tpl = Bldr::Template.new { "object(:person => alex) { attribute(:name) }" }
-    tpl.render(Node.new, :alex => alex).should == {:person => {:name => 'alex'}}
+    tpl.render(Node.new, :alex => alex).should == jsonify({:person => {:name => 'alex'}})
   end
 
   it "works when render two top-level objects" do
@@ -25,9 +25,9 @@ describe "evaluating a tilt template" do
     }
 
     result = tpl.render(Node.new, :alex => alex, :john => john)
-    result.should == {
+    result.should == jsonify({
       :person_1 => {:name => 'alex'},
       :person_2 => {:name => 'john'}
-    }
+    })
   end
 end

@@ -47,12 +47,13 @@ module Bldr
     #   and the object to serialize.
     # @param [Proc] block the code block to evaluate
     #
-    # @return [Nil]
+    # @return [String] returns a json-encoded string of itself and all
+    #   descendant nodes.
     def object(hash, &block)
       key  = hash.keys.first
       node = Node.new(hash, :parent => self, &block)
       merge_result!(key, node.render!)
-      node.parent.render!
+      node.parent.to_json
     end
 
     # Add attributes to the result hash in a variety of ways
