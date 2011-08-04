@@ -48,7 +48,7 @@ describe "Using Bldr with a sinatra app" do
     request = Rack::MockRequest.new(TestApp)
     response = request.get '/'
     response.status.should == 200
-    response.body.should == jsonify({'dude' => {'name' => 'alex', 'age' => 25}})
+    parse_json(response.body).should == {'dude' => {'name' => 'alex', 'age' => 25}}
   end
 
   it "properly serializes templates with collections" do
@@ -56,19 +56,19 @@ describe "Using Bldr with a sinatra app" do
     response = request.get '/collections'
 
     response.status.should == 200
-    response.body.should == jsonify({
+    parse_json(response.body).should == {
       'person'=> {'name' => 'alex', 'age' => 25, 'friends' => [{'name' => 'john', 'age' => 24}]}
-    })
+    }
   end
 
   it "works with template files" do
     request = Rack::MockRequest.new(TestApp)
     response = request.get '/template'
 
-    response.body.should == jsonify({
+    parse_json(response.body).should == {
       'person' => {'name' => 'bert', 'age' => 25, 'name_age' => "bert 25",
         'friend' => {'name' => 'ernie', 'age' => 26}
       }
-    })
+    }
   end
 end
