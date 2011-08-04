@@ -27,6 +27,6 @@ describe "Using Bldr with a sinatra app" do
     request = Rack::MockRequest.new(TestApp)
     response = request.get '/'
     response.status.should == 200
-    parse(response.body).should == {'dude' => {'name' => 'alex', 'age' => 25}}
+    parse_json(response.body).should == {'dude' => {'name' => 'alex', 'age' => 25}}
   end
 end

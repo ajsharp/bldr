@@ -16,7 +16,7 @@ RSpec.configure do |c|
   end
 
   # Parse some json and return a ruby object
-  def parse(str)
+  def parse_json(str)
     Yajl::Parser.parse(str)
   end
 

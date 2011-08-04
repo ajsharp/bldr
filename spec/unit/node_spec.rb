@@ -43,6 +43,16 @@ describe "Node#attributes" do
     }.to raise_error(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.")
   end
 
+  it "returns nil attributes in the result" do
+    node = node_wrap do
+      object :person => Person.new('alex') do
+        attributes :name, :age
+      end
+    end
+
+    node.render!.should == {:person => {:name => 'alex', :age => nil}}
+  end
+
 end
 
 describe "Node#render!" do
@@ -148,5 +158,16 @@ describe "Node#to_json" do
         :friend => {:name => 'pete', :age => 30}
       }
     })
+  end
+
+  it "returns null values for nil attributes" do
+    node = node_wrap do
+      object :person => Person.new('alex') do
+        attributes :name, :age
+      end
+    end
+
+    parse_json(node.to_json)['person'].should have_key('age')
+    parse_json(node.to_json)['person']['age'].should be_nil
   end
 end
