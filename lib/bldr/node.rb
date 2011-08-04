@@ -43,7 +43,33 @@ module Bldr
 
     # Create and render a node.
     #
-    # @param [Hash] hash a key/value pair indicating the output key name
+    # @example A keyed object
+    #   get '/users/:id' do
+    #     user = User.find(params['id'])
+    #
+    #     bldr :'users/show.json', :locals => {:user => user}
+    #   end
+    #
+    #   # views/users/show.json.bldr
+    #   object :user => user do
+    #     attributes :name, :email
+    #
+    #     attribute(:id) { |person| person.id.to_s }
+    #   end
+    #
+    # @example Root-level object with no key
+    #   get '/' do
+    #     url = "http://google.com"
+    #
+    #     bldr :'template.json', :locals => {:url => url}
+    #   end
+    #
+    #   # views/template.json.bldr
+    #   object do
+    #     attributes(:url) { url }
+    #   end
+    #
+    # @param [Hash, Nil] hash a key/value pair indicating the output key name
     #   and the object to serialize.
     # @param [Proc] block the code block to evaluate
     #
