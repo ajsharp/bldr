@@ -96,6 +96,7 @@ end
 ```
 
 Output:
+
 ```javascript
 {
   "post": {
@@ -106,6 +107,7 @@ Output:
 ```
 
 ### Attribute aliases
+
 ```ruby
 object :post => post do
   attributes :title, :body
@@ -117,6 +119,7 @@ end
 ```
 
 Output:
+
 ```javascript
 {
   "post": {
