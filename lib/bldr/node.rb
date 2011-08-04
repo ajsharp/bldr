@@ -3,7 +3,7 @@ module Bldr
 
   class Node
 
-    attr_reader :value, :result, :parent
+    attr_reader :current_object, :result, :parent
 
     # Initialize a new Node instance.
     #
@@ -18,8 +18,8 @@ module Bldr
     #
     # @param [Object] value an object to serialize.
     def initialize(value = nil, opts = {}, &block)
-      @value  = value
-      @parent = opts[:parent]
+      @current_object = value
+      @parent         = opts[:parent]
 
       # Storage hash for all descendant nodes
       @result  = {}
@@ -108,15 +108,15 @@ module Bldr
           raise(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.")
         end
 
-        merge_result!(args.first, (block.arity == 1) ? block.call(value) : value.instance_eval(&block))
+        merge_result!(args.first, (block.arity == 1) ? block.call(current_object) : current_object.instance_eval(&block))
         return nil
       end
 
       args.each do |arg|
         if arg.is_a?(Hash)
-          merge_result!(arg.keys.first, value.send(arg.values.first))
+          merge_result!(arg.keys.first, current_object.send(arg.values.first))
         else
-          merge_result!(arg, value.send(arg))
+          merge_result!(arg, current_object.send(arg))
         end
       end
       nil
