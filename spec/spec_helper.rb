@@ -11,7 +11,9 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "..", "lib", "bldr")
 Dir['spec/models/*'].each { |f| require File.expand_path(f) }
 
 RSpec.configure do |c|
-  c.include Bldr
+  def node_wrap(*args, &block)
+    Bldr::Node.new(*args, &block)
+  end
 
   # Parse some json and return a ruby object
   def parse(str)

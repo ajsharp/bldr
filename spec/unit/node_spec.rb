@@ -1,12 +1,9 @@
 require 'spec_helper'
 
 describe "Node#attributes" do
-  let(:alex) {
-  }
-
   def wrap(&block)
     alex = Person.new('alex').tap { |p| p.age = 25; p }
-    Node.new do
+    Bldr::Node.new do
       object(:person => alex, &block)
     end
   end
@@ -38,7 +35,7 @@ describe "Node#attributes" do
 
   it "raises an error when you use the block syntax with more than one attribute" do
     expect {
-      wrap {
+      node_wrap {
         attributes(:one, :two) do |person|
           "..."
         end
@@ -50,11 +47,11 @@ end
 
 describe "Node#render!" do
   it "returns an empty hash when not passed an object" do
-    Node.new.render!.should == {}
+    Bldr::Node.new.render!.should == {}
   end
 
   it "a document with a single node with no nesting" do
-    node = Node.new do
+    node = node_wrap do
       object :person => Person.new('alex') do
         attributes :name
       end
@@ -66,7 +63,7 @@ describe "Node#render!" do
   it "works for multiple top-level objects" do
     alex, john = Person.new("alex"), Person.new("john")
 
-    node = Node.new do
+    node = node_wrap do
       object(:alex => alex) do
         attributes :name
       end
@@ -80,7 +77,7 @@ describe "Node#render!" do
   end
 
   it "recursively renders nested objects" do
-    node = Node.new do
+    node = node_wrap do
       object :alex => Person.new("alex") do
         attributes :name
 
@@ -105,7 +102,7 @@ describe "Node#render!" do
         p
       end
 
-      node = Node.new do
+      node = node_wrap do
         object(:person => alex) do
           attributes({:surname => :name}, :age)
         end
@@ -118,7 +115,7 @@ end
 
 describe "Node#object" do
   it "evaluates the block and returns json" do
-    node = Node.new
+    node = Bldr::Node.new
     result = node.object(:dude => Person.new("alex")) do
       attributes :name
 
@@ -135,7 +132,7 @@ end
 
 describe "Node#to_json" do
   it "recursively returns the result json" do
-    node = Node.new do
+    node = node_wrap do
       object :person => Person.new("alex") do
         attributes :name
 
