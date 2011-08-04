@@ -171,3 +171,24 @@ describe "Node#to_json" do
     parse_json(node.to_json)['person']['age'].should be_nil
   end
 end
+
+describe "Node#collection" do
+  it "iterates through the collection and renders them as nodes" do
+    node = node_wrap do
+      object :person => Person.new('alex', 26) do
+        attributes :name, :age
+
+        collection :friends => [Person.new('john', 24), Person.new('jeff', 25)] do
+          attributes :name, :age
+        end
+      end
+    end
+
+    node.render!.should == {
+      :person => {
+        :name => 'alex', :age => 26,
+        :friends => [{:name => 'john', :age => 24}, {:name => 'jeff', :age => 25}]
+      }
+    }
+  end
+end

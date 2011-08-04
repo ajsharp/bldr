@@ -57,6 +57,17 @@ module Bldr
       node.parent.to_json
     end
 
+    def collection(items, &block)
+      key   = items.keys.first
+      items = items.values.first
+
+      merge_result!(key, [])
+      items.each do |item|
+        node = Node.new(item, :parent => self, &block)
+        append_result!(key, node.render!)
+      end
+    end
+
     # Add attributes to the result hash in a variety of ways
     #
     # @example Simple list of attributes
@@ -117,6 +128,10 @@ module Bldr
     # Merges values into the "local" result hash.
     def merge_result!(key, val)
       result[key] = val
+    end
+
+    def append_result!(key, val)
+      result[key] << val
     end
 
   end
