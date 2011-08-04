@@ -1,3 +1,4 @@
+require 'tilt'
 
 module Bldr
 
