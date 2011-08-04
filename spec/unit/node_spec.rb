@@ -191,4 +191,14 @@ describe "Node#collection" do
       }
     }
   end
+
+  it "renders propery when a collection is the root node" do
+    nodes = node_wrap do
+      collection :people => [Person.new('bert'), Person.new('ernie')] do
+        attributes :name
+      end
+    end
+
+    nodes.render!.should == {:people => [{:name => 'bert'}, {:name => 'ernie'}]}
+  end
 end
