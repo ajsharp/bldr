@@ -19,7 +19,7 @@ describe "Using Bldr with a sinatra app" do
       RUBY
 
       status(200)
-      bldr tpl, {}, :alex => alex
+      bldr tpl, :locals => {:alex => alex}
     end
   end
 
