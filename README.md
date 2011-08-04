@@ -49,18 +49,16 @@ render templates.
 get "/posts" do
   # ...
   posts = Post.all
-  bldr :'path/to/template.json', {}, {:posts => posts}
+  bldr :'template.json', {}, {:posts => posts}
 end
 
-# template file
-
+# views/template.json.bldr
 collection :posts => posts do
   attributes :title
   attribute :comment_count { |post| post.comments.count }
 
-  # current_object
   collection :comments => current_object.comments do
-
+    attributes :body, :author, :email
   end
 end
 ```
@@ -76,6 +74,7 @@ end
 ```
 
 Output:
+
 ```javascript
 {
   "post": {
@@ -141,8 +140,7 @@ object :post => post do
   object :author => post.author do
     attributes :first_name, :last_name, :email
 
-    attribute(:full_name) { |author| "#{author.first_name}
-#{author.last_name}" }
+    attribute(:full_name) { |author| "#{author.first_name} #{author.last_name}" }
   end
 end
 ```
@@ -186,7 +184,10 @@ Output:
 
 ### Collections
 
-All the examples above can be used inside a collection block:
+All the examples above can be used inside a collection block. Here we
+assume a Post model which has many Comments. You might use the below
+code to render an action which returns a collection of posts, where
+each post has a collection of comments.
 
 ```ruby
 collection :posts => posts do
@@ -226,14 +227,34 @@ Output:
 ```
 
 When inside of a collection block, you can use the `current_object`
-method to access the member of the collection.
+method to access the member of the collection currently being iterated
+over. This allows you to do nested collections, as in the example above.
 
 ### Templates
 
-Your templates should be named with the content type extension before
-the .bldr extension. For example: `my_template.json.bldr`. The templates
-themselves are just pure ruby code. They are evaluated in the context of a
-`Bldr::Node` instance.
+It is recommended to name your templates with the content type extension before
+the .bldr extension. For example: `my_template.json.bldr`.
+
+The templates themselves are just plain ruby code. They are evaluated in the context of a
+`Bldr::Node` instance, which provides the bldr DSL. The DSL is comprised
+primarily of 3 simple methods:
+
++ `object` - Creates an object
++ `collection` - Iterates over a collection of objects
++ `attributes` - Add attributes to the current object.
+
+### Local Variables
+
+You may pass local variables from your sinatra actions to bldr templates
+by passing the `bldr` method a `:locals` hash, like so:
+
+```ruby
+get '/posts' do
+  posts = Post.all.recent
+
+  bldr :'posts/index.json', :locals => {:posts => posts}
+end
+```
 
 ## Editor Syntax Support
 
@@ -252,6 +273,7 @@ au BufRead,BufNewFile *.bldr set filetype=ruby
 ## Acknowledgements
 
 * [RABL](http://github.com/nesquena/rabl) - Inspiration
+* [Tilt](https://github.com/rtomayko/tilt) - Mega awesome goodness
 
 ## Copyright
 
