@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.authors     = ["Alex Sharp"]
   s.email       = ["ajsharp@gmail.com"]
   s.homepage    = "https://github.com/ajsharp/bldr"
-  s.summary     = %q{Minimalist templating library.}
+  s.summary     = %q{Templating library with a simple, minimalist DSL.}
   s.description = %q{Provides a simple and intuitive templating DSL for serializing objects to JSON.}
 
   s.rubyforge_project = "bldr"
