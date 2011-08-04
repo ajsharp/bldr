@@ -5,9 +5,6 @@ describe "Using Bldr with a sinatra app" do
   require 'sinatra/bldr'
 
   class TestApp < Sinatra::Base
-    enable :raise_errors
-    enable :show_exceptions
-
     register Sinatra::Bldr
 
     get '/' do
@@ -27,6 +24,6 @@ describe "Using Bldr with a sinatra app" do
     request = Rack::MockRequest.new(TestApp)
     response = request.get '/'
     response.status.should == 200
-    parse_json(response.body).should == {'dude' => {'name' => 'alex', 'age' => 25}}
+    response.body.should == jsonify({'dude' => {'name' => 'alex', 'age' => 25}})
   end
 end
