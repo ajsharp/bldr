@@ -16,10 +16,10 @@ module Bldr
     #   node.to_json # => {"person": {"name": "alex"}}
     #
     #
-    # @param [Hash] value a key => value pair.
-    def initialize(value = {}, opts = {}, &block)
-      @value     = value.values.first
-      @parent    = opts[:parent]
+    # @param [Object] value an object to serialize.
+    def initialize(value = nil, opts = {}, &block)
+      @value  = value
+      @parent = opts[:parent]
 
       # Storage hash for all descendant nodes
       @result  = {}
@@ -50,8 +50,9 @@ module Bldr
     # @return [String] returns a json-encoded string of itself and all
     #   descendant nodes.
     def object(hash, &block)
-      key  = hash.keys.first
-      node = Node.new(hash, :parent => self, &block)
+      key   = hash.keys.first
+      value = hash.values.first
+      node  = Node.new(value, :parent => self, &block)
       merge_result!(key, node.render!)
       node.parent.to_json
     end
