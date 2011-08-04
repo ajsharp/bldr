@@ -8,5 +8,8 @@ require 'bldr/node'
 
 module Bldr
   class << self
+    def json_encoder=(encoder)
+      MultiJson.engine = encoder
+    end
   end
 end

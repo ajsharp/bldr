@@ -9,8 +9,9 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'multi_json', '~> 1.0.3'
 
-  s.add_development_dependency 'sinatra', '~>1.2.6'
-  s.add_development_dependency 'tilt',    '~>1.3.2'
+  s.add_development_dependency 'json_pure'
+  s.add_development_dependency 'sinatra',   '~>1.2.6'
+  s.add_development_dependency 'tilt',      '~>1.3.2'
   s.add_development_dependency 'yajl-ruby'
 
 end
