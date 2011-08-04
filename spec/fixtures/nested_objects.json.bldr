@@ -1,0 +1,11 @@
+
+object :person => bert do
+  attributes :name, :age
+  attribute :name_age do
+    "#{name} #{age}"
+  end
+
+  object :friend => ernie do
+    attributes :name, :age
+  end
+end
