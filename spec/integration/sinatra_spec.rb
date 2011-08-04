@@ -7,6 +7,8 @@ describe "Using Bldr with a sinatra app" do
   class TestApp < Sinatra::Base
     register Sinatra::Bldr
 
+    set :views, File.expand_path(__FILE__ + '/../..')
+
     get '/' do
       alex =  Person.new("alex", 25)
       tpl = <<-RUBY
@@ -34,6 +36,12 @@ describe "Using Bldr with a sinatra app" do
 
       bldr tpl, :locals => {:alex => alex}
     end
+
+    get '/template' do
+      bert  = Person.new('bert', 25)
+      ernie = Person.new('ernie', 26)
+      bldr :'fixtures/nested_objects.json', :locals => {:bert => bert, :ernie => ernie}
+    end
   end
 
   it "returns json for a simple single-level template" do
@@ -50,6 +58,17 @@ describe "Using Bldr with a sinatra app" do
     response.status.should == 200
     response.body.should == jsonify({
       'person'=> {'name' => 'alex', 'age' => 25, 'friends' => [{'name' => 'john', 'age' => 24}]}
+    })
+  end
+
+  it "works with template files" do
+    request = Rack::MockRequest.new(TestApp)
+    response = request.get '/template'
+
+    response.body.should == jsonify({
+      'person' => {'name' => 'bert', 'age' => 25, 'name_age' => "bert 25",
+        'friend' => {'name' => 'ernie', 'age' => 26}
+      }
     })
   end
 end
