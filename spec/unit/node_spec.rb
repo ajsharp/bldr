@@ -192,7 +192,7 @@ describe "Node#collection" do
     }
   end
 
-  it "renders propery when a collection is the root node" do
+  it "renders properly when a collection is the root node" do
     nodes = node_wrap do
       collection :people => [Person.new('bert'), Person.new('ernie')] do
         attributes :name
@@ -201,4 +201,61 @@ describe "Node#collection" do
 
     nodes.render!.should == {:people => [{:name => 'bert'}, {:name => 'ernie'}]}
   end
+
+  it "renders nested collections properly" do
+    post = Post.new("my post")
+    post.comments << Comment.new('my comment')
+
+    nodes = node_wrap do
+      collection :posts => [post] do
+        attributes :title
+        attribute(:comment_count) { |post| post.comments.count }
+
+        collection :comments => current_object.comments do
+          attributes :body
+        end
+      end
+    end
+
+    nodes.render!.should == {
+      :posts => [
+        {:title => 'my post', :comment_count => 1, :comments => [{:body => 'my comment'}]}
+      ]
+    }
+  end
+
+  it "renders nested collections with dynamic property values correctly" do
+    post1 = Post.new("post 1")
+    post2 = Post.new("post 2")
+    post1.comments << Comment.new('post 1 comment')
+    post2.comments << Comment.new('post 2 first comment')
+    post2.comments << Comment.new('post 2 second comment')
+
+    nodes = node_wrap do
+      collection :posts => [post1, post2] do
+        attributes :title
+        attribute(:comment_count) { |post| post.comments.count }
+
+        collection :comments => current_object.comments do
+          attributes :body
+        end
+      end
+    end
+
+    nodes.render!.should == {
+      :posts => [
+        {
+          :title => 'post 1',
+          :comment_count => 1,
+          :comments => [{:body => 'post 1 comment'}]
+        },
+        {
+          :title => 'post 2',
+          :comment_count => 2,
+          :comments => [{:body => 'post 2 first comment'}, {:body => 'post 2 second comment'}]
+        }
+      ]
+    }
+  end
+
 end
