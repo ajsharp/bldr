@@ -155,7 +155,7 @@ module Bldr
     private
 
     # Merges values into the "local" result hash.
-    def merge_result!(key = nil, val)
+    def merge_result!(key = nil, val={})
       if key
         result[key] = val
       else
