@@ -1,0 +1,5 @@
+
+object do
+  attribute(:name) { name }
+  attribute(:age)  { age }
+end

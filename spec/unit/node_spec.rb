@@ -258,4 +258,18 @@ describe "Node#collection" do
     }
   end
 
+  it "allows root level attributes using local variables" do
+    node = node_wrap do
+      name = "john doe"
+      age  = 25
+
+      object do
+        attribute(:name) { name }
+        attribute(:age) { age }
+      end
+    end
+
+    node.render!.should == {:name => 'john doe', :age => 25}
+  end
+
 end

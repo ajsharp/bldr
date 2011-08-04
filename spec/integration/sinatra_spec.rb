@@ -42,6 +42,13 @@ describe "Using Bldr with a sinatra app" do
       ernie = Person.new('ernie', 26)
       bldr :'fixtures/nested_objects.json', :locals => {:bert => bert, :ernie => ernie}
     end
+
+    get '/root_template' do
+      name = "john doe"
+      age  = 26
+
+      bldr :'fixtures/root_template.json', :locals => {:name => name, :age => age}
+    end
   end
 
   it "returns json for a simple single-level template" do
@@ -70,5 +77,12 @@ describe "Using Bldr with a sinatra app" do
         'friend' => {'name' => 'ernie', 'age' => 26}
       }
     }
+  end
+
+  it "allows using root-level attributes" do
+    request = Rack::MockRequest.new(TestApp)
+    response = request.get '/root_template'
+
+    parse_json(response.body).should == {'name' => 'john doe', 'age' => 26}
   end
 end

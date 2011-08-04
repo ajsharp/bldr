@@ -49,9 +49,12 @@ module Bldr
     #
     # @return [String] returns a json-encoded string of itself and all
     #   descendant nodes.
-    def object(hash, &block)
-      key   = hash.keys.first
-      value = hash.values.first
+    def object(hash = nil, &block)
+      if hash
+        key   = hash.keys.first
+        value = hash.values.first
+      end
+
       node  = Node.new(value, :parent => self, &block)
       merge_result!(key, node.render!)
       node.parent.to_json
@@ -126,8 +129,12 @@ module Bldr
     private
 
     # Merges values into the "local" result hash.
-    def merge_result!(key, val)
-      result[key] = val
+    def merge_result!(key = nil, val)
+      if key
+        result[key] = val
+      else
+        result.merge!(val)
+      end
     end
 
     def append_result!(key, val)
