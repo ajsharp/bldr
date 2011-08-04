@@ -164,6 +164,26 @@ Output:
 }
 ```
 
+### Root-level attributes
+
+```ruby
+get '/redirector' do
+  url = params['redirect_url']
+  bldr :'redirect.json', :locals => {:url => url}
+end
+
+# views/redirect.json.bldr
+object do
+  attribute(:redirect_to) { url }
+end
+```
+
+Output:
+
+```javascript
+{"redirect_to": "http://example.org"}
+```
+
 ### Collections
 
 All the examples above can be used inside a collection block:
@@ -218,6 +238,7 @@ themselves are just pure ruby code. They are evaluated in the context of a
 ## Editor Syntax Support
 
 To get proper syntax highlighting in vim, add this line to your .vimrc:
+
 ```
 au BufRead,BufNewFile *.bldr set filetype=ruby
 ```
