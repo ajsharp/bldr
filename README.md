@@ -275,6 +275,10 @@ au BufRead,BufNewFile *.bldr set filetype=ruby
 * [RABL](http://github.com/nesquena/rabl) - Inspiration
 * [Tilt](https://github.com/rtomayko/tilt) - Mega awesome goodness
 
+## Contributors
+
+* Ian Hunter (@ihunter)
+
 ## Copyright
 
 Copyright (c) 2011 Alex Sharp. See the MIT-LICENSE file for full
