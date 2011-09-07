@@ -30,4 +30,99 @@ describe "evaluating a tilt template" do
       :person_2 => {:name => 'john'}
     })
   end
+
+  describe "root Object nodes" do
+
+    let(:alex) { Person.new('alex', 25) }
+    let(:ian) { Person.new('ian', 32) }
+
+    it "returns json for a blank root object " do
+      tpl  = Bldr::Template.new {
+        <<-RUBY
+          object do
+            attribute(:url) {"http://google.com"}
+          end
+        RUBY
+      }
+      result = tpl.render(Bldr::Node.new)
+      result.should == jsonify({'url' => 'http://google.com'})
+    end
+
+    it "returns json for a root object" do
+      tpl = Bldr::Template.new {
+        <<-RUBY
+          object :person => alex do
+            attributes :name, :age
+          end
+        RUBY
+      }
+      result = tpl.render(Bldr::Node.new, :alex => alex, :ian => ian)
+      result.should == jsonify({'person' => {'name' => 'alex', 'age' => 25}})
+    end
+
+    it "returns json for root object templates with nested collections" do
+      tpl = Bldr::Template.new {
+        <<-RUBY
+          object :person => alex do
+            attributes :name, :age
+
+            collection :friends => friends do
+              attributes :name, :age
+            end
+          end
+        RUBY
+      }
+      result = tpl.render(Bldr::Node.new, :alex => alex, :friends => [ian])
+      result.should == jsonify({
+        'person'=> {'name' => 'alex', 'age' => 25, 'friends' => [{'name' => 'ian', 'age' => 32}]}
+      })
+    end
+
+  end
+
+  describe "root Collection nodes" do
+
+    let(:alex) { Person.new('alex', 25, [Person.new('bo',33)]) }
+    let(:ian) { Person.new('ian', 32, [Person.new('eric',34)]) }
+
+    it "returns json for a root collection template" do
+      tpl = Bldr::Template.new {
+        <<-RUBY
+          collection :people => people do
+            attributes :name, :age
+          end
+        RUBY
+      }
+      result = tpl.render(Bldr::Node.new, :people => [alex,ian])
+      result.should == jsonify({
+        'people'=> [{'name' => 'alex', 'age' => 25},{'name' => 'ian', 'age' => 32}]
+      })
+    end
+
+    it "returns json for a root collection with embedded collection template" do
+      tpl = Bldr::Template.new {
+        <<-RUBY
+          collection :people => people do
+            attributes :name, :age
+            collection :friends => current_object.friends do
+              attributes :name, :age
+            end
+          end
+        RUBY
+      }
+      result = tpl.render(Bldr::Node.new, :people => [alex,ian])
+      result.should == jsonify({
+        'people'=> [{
+          'name' => 'alex',
+          'age' => 25,
+          "friends" => [{"name" => 'bo', "age" => 33}]
+        },{
+          'name' => 'ian',
+          'age' => 32,
+          "friends" => [{"name" => 'eric', "age" => 34}]
+        }]
+      })
+    end
+
+  end
 end

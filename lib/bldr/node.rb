@@ -83,18 +83,16 @@ module Bldr
 
       node  = Node.new(value, :parent => self, &block)
       merge_result!(key, node.render!)
-      node.parent.to_json
+      self.to_json
     end
 
     def collection(items, &block)
       key   = items.keys.first
-      items = items.values.first
+      values = items.values.to_a.first
 
-      merge_result!(key, [])
-      items.each do |item|
-        node = Node.new(item, :parent => self, &block)
-        append_result!(key, node.render!)
-      end
+      merge_result! key, values.map{|item| Node.new(item, :parent => self, &block).render!}
+
+      self.to_json
     end
 
     # Add attributes to the result hash in a variety of ways
