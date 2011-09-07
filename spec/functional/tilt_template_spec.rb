@@ -57,7 +57,7 @@ describe "evaluating a tilt template" do
         RUBY
       }
       result = tpl.render(Bldr::Node.new, :alex => alex, :ian => ian)
-      result.should == jsonify({'person' => {'name' => 'alex', 'age' => 25}})
+      parse_json(result).should == {'person' => {'name' => 'alex', 'age' => 25}}
     end
 
     it "returns json for root object templates with nested collections" do
@@ -73,9 +73,9 @@ describe "evaluating a tilt template" do
         RUBY
       }
       result = tpl.render(Bldr::Node.new, :alex => alex, :friends => [ian])
-      result.should == jsonify({
+      parse_json(result).should == {
         'person'=> {'name' => 'alex', 'age' => 25, 'friends' => [{'name' => 'ian', 'age' => 32}]}
-      })
+      }
     end
 
   end
@@ -94,9 +94,9 @@ describe "evaluating a tilt template" do
         RUBY
       }
       result = tpl.render(Bldr::Node.new, :people => [alex,ian])
-      result.should == jsonify({
+      parse_json(result).should == {
         'people'=> [{'name' => 'alex', 'age' => 25},{'name' => 'ian', 'age' => 32}]
-      })
+      }
     end
 
     it "returns json for a root collection with embedded collection template" do
@@ -111,7 +111,7 @@ describe "evaluating a tilt template" do
         RUBY
       }
       result = tpl.render(Bldr::Node.new, :people => [alex,ian])
-      result.should == jsonify({
+      parse_json(result).should == {
         'people'=> [{
           'name' => 'alex',
           'age' => 25,
@@ -121,7 +121,7 @@ describe "evaluating a tilt template" do
           'age' => 32,
           "friends" => [{"name" => 'eric', "age" => 34}]
         }]
-      })
+      }
     end
 
   end
