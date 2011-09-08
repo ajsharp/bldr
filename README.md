@@ -49,7 +49,7 @@ render templates.
 get "/posts" do
   # ...
   posts = Post.all
-  bldr :'template.json', {}, {:posts => posts}
+  bldr :'template.json', :locals => {:posts => posts}
 end
 
 # views/template.json.bldr
