@@ -178,65 +178,77 @@ describe "Node#object" do
 
     describe "#attribute" do
 
-      it "errors on a single argument"
-      it "errors on 3 arguments"
-      it "errors on 2 arguments and a lambda"
-      it "renders 1 argument to the inferred object"
-      it "renders 2 arguments statically"
-      it "renders 1 argument and one lambda"
+      it "errors on 3 arguments" do
+        expect {
+          node_wrap {
+            attribute(:one, :two, :three)
+          }
+        }.to raise_error(ArgumentError, ERROR_MESSAGES[:attribute_more_than_two_arg])
+      end
+      it "errors on 2 arguments and a lambda" do
+        expect {
+          node_wrap {
+            attribute(:one, :two) do |person|
+              "..."
+            end
+          }
+        }.to raise_error(ArgumentError, ERROR_MESSAGES[:attribute_lambda_one_argument])
+      end
+      it "renders 1 argument to the inferred object" do
+        node = wrap { attribute(:name) }
+        node.render!.should == {:person => {:name => 'alex'}}
+      end
+      it "renders 2 arguments statically" do
+        node = wrap { attribute(:name, "ian") }
+        node.render!.should == {:person => {:name => 'ian'}}
+      end
+      it "renders 1 argument and one lambda with zero arity" do
+        node = wrap { attribute(:name){"ian"} }
+        node.render!.should == {:person => {:name => 'ian'}}
+      end
+      it "renders 1 argument and one lambda with arity 1" do
+        node = wrap { attribute(:name){|person| person.name} }
+        node.render!.should == {:person => {:name => 'alex'}}
+      end
+      it "renders nil attributes" do
+        node = node_wrap do
+          object :person => Person.new('alex') do
+            attribute :age
+          end
+        end
+
+        node.render!.should == {:person => {:age => nil}}
+      end
 
     end
 
     describe "#attributes" do
 
-      it "errors if the current_object is nil"
-      it "renders each argument against the inferred object"
-
-    end
-
-    it "adds attributes of the person to the result hash" do
-      node = wrap { attributes(:name, :age) }
-      node.render!.should == {:person => {:name => 'alex', :age => 25}}
-    end
-
-    it "supports dynamic block attributes with explicit object context" do
-      node = wrap do
-        attribute(:oldness) do |person|
-          "#{person.age} years"
-        end
-      end
-
-      node.render!.should == {:person => {:oldness => "25 years"}}
-    end
-
-    it "supports dynamic block attributes with implicit object context" do
-      node = wrap do
-        attribute(:oldness) do
-          "#{age} years"
-        end
-      end
-
-      node.render!.should == {:person => {:oldness => "25 years"}}
-    end
-
-    it "raises an error when you use the block syntax with more than one attribute" do
-      expect {
-        node_wrap {
-          attribute(:one, :two) do |person|
-            "..."
+      it "errors if the current_object is nil" do
+        expect {
+          node = node_wrap do
+            object(:person => nil) do
+              attributes(:one, :two) do |person|
+                "..."
+              end
+            end
           end
-        }
-      }.to raise_error(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.")
-    end
-
-    it "returns nil attributes in the result" do
-      node = node_wrap do
-        object :person => Person.new('alex') do
-          attributes :name, :age
+        }.to raise_error(ArgumentError, ERROR_MESSAGES[:attributes_inferred_missing])
+      end
+      it "renders each argument against the inferred object" do
+        node = wrap { attributes(:name, :age) }
+        node.render!.should == {:person => {:name => 'alex', :age => 25}}
+      end
+      it "renders nil attributes" do
+        node = node_wrap do
+          object :person => Person.new('alex') do
+            attributes :name, :age
+          end
         end
+
+        node.render!.should == {:person => {:name => 'alex', :age => nil}}
       end
 
-      node.render!.should == {:person => {:name => 'alex', :age => nil}}
     end
 
   end
