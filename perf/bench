@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+output = `ruby -r bench_press ./benchmark.rb`
+
+results = File.open(File.expand_path(File.dirname(__FILE__)) + "/results.txt", "a") do |f|
+  f.puts "\n"
+  f.puts "=" * 80
+  f.puts "Spec run time: #{Time.now}"
+  f.puts "Git SHA: #{`cat ../.git/\`cat ../.git/HEAD | awk '{print $2}'\``.chomp}"
+  f.puts "Latest Tag: #{`git tag | tail -n 1`}"
+  f.puts output
+end
