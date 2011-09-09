@@ -1,56 +1,277 @@
 require 'spec_helper'
 
-describe "Node#attributes" do
-  def wrap(&block)
-    alex = Person.new('alex').tap { |p| p.age = 25; p }
-    Bldr::Node.new do
-      object(:person => alex, &block)
-    end
-  end
+ERROR_MESSAGES = { :attribute_lambda_one_argument              => "You may only pass one argument to #attribute when using the block syntax.",
+                   :attribute_inferred_missing_one_argument    => "You cannot pass one argument to #attribute when inferred object is not present.",
+                   :attribute_more_than_two_arg                => "You cannot pass more than two arguments to #attribute.",
+                   :attribute_inferred_missing_arity_too_large => "You cannot use a block of arity > 0 if inferred object is not present.",
+                   :attributes_inferred_missing                => "You cannot use #attributes when inferred object is not present." }
 
-  it "adds attributes of the person to the result hash" do
-    node = wrap { attributes(:name, :age) }
-    node.render!.should == {:person => {:name => 'alex', :age => 25}}
-  end
+describe "Node#object" do
 
-  it "supports dynamic block attributes with explicit object context" do
-    node = wrap do
-      attribute(:oldness) do |person|
-        "#{person.age} years"
+  context "a zero arg root object node" do
+
+    def wrap(&block)
+      Bldr::Node.new do
+        object(&block)
       end
     end
 
-    node.render!.should == {:person => {:oldness => "25 years"}}
+    describe "#attribute" do
+
+      it "errors on a single argument" do
+        expect {
+          node_wrap {
+            attribute(:one, :two) do |person|
+              "..."
+            end
+          }
+        }.to raise_error(ArgumentError, ERROR_MESSAGES[:attribute_lambda_one_argument])
+      end
+      it "errors on 3 arguments" do
+        expect {
+          node_wrap {
+            attribute(:one, :two, :three)
+          }
+        }.to raise_error(ArgumentError, ERROR_MESSAGES[:attribute_more_than_two_arg])
+      end
+      it "errors on 2 arguments and a lambda" do
+        expect {
+          node_wrap {
+            attribute(:one, :two) do |person|
+              "..."
+            end
+          }
+        }.to raise_error(ArgumentError, ERROR_MESSAGES[:attribute_lambda_one_argument])
+      end
+      it "errors on 1 argument since there is no inferred object" do
+        expect {
+          node_wrap {
+            attribute(:one)
+          }
+        }.to raise_error(ArgumentError, ERROR_MESSAGES[:attribute_inferred_missing_one_argument])
+      end
+      it "renders 2 arguments statically" do
+        node = wrap { attribute(:name, "alex") }
+        node.render!.should == {:name => 'alex'}
+      end
+      it "renders 1 argument and one lambda with zero arity" do
+        node = wrap {
+          attribute(:name) do
+            "alex"
+          end
+        }
+        node.render!.should == {:name => 'alex'}
+      end
+      it "errors on 1 argument and one lambda with arity 1" do
+        expect {
+          node_wrap {
+            attribute(:name) do |name|
+              name
+            end
+          }
+        }.to raise_error(ArgumentError, ERROR_MESSAGES[:attribute_inferred_missing_arity_too_large])
+      end
+
+    end
+
+    describe "#attributes" do
+
+      it "errors since current_object is nil" do
+        expect {
+          node_wrap {
+            attributes(:name)
+          }
+        }.to raise_error(ArgumentError, ERROR_MESSAGES[:attributes_inferred_missing])
+      end
+
+    end
+
   end
 
-  it "supports dynamic block attributes with implicit object context" do
-    node = wrap do
-      attribute(:oldness) do
-        "#{age} years"
+  context "a single arg root object node" do
+
+    def wrap(&block)
+      Bldr::Node.new do
+        object(:person, &block)
       end
     end
 
-    node.render!.should == {:person => {:oldness => "25 years"}}
+    describe "#attribute" do
+
+      it "errors on a single argument" do
+        expect {
+          node_wrap {
+            attribute(:one, :two) do |person|
+              "..."
+            end
+          }
+        }.to raise_error(ArgumentError, ERROR_MESSAGES[:attribute_lambda_one_argument])
+      end
+      it "errors on 3 arguments" do
+        expect {
+          node_wrap {
+            attribute(:one, :two, :three)
+          }
+        }.to raise_error(ArgumentError, ERROR_MESSAGES[:attribute_more_than_two_arg])
+      end
+      it "errors on 2 arguments and a lambda" do
+        expect {
+          node_wrap {
+            attribute(:one, :two) do |person|
+              "..."
+            end
+          }
+        }.to raise_error(ArgumentError, ERROR_MESSAGES[:attribute_lambda_one_argument])
+      end
+      it "errors on 1 argument since there is no inferred object" do
+        expect {
+          node_wrap {
+            attribute(:one)
+          }
+        }.to raise_error(ArgumentError, ERROR_MESSAGES[:attribute_inferred_missing_one_argument])
+      end
+      it "renders 2 arguments statically" do
+        node = wrap { attribute(:name, "alex") }
+        node.render!.should == {:person => {:name => 'alex'}}
+      end
+      it "renders 1 argument and one lambda with zero arity" do
+        node = wrap {
+          attribute(:name) do
+            "alex"
+          end
+        }
+        node.render!.should == {:person => {:name => 'alex'}}
+      end
+      it "errors on 1 argument and one lambda with arity 1" do
+        expect {
+          node_wrap {
+            attribute(:name) do |name|
+              name
+            end
+          }
+        }.to raise_error(ArgumentError, ERROR_MESSAGES[:attribute_inferred_missing_arity_too_large])
+      end
+    end
+
+    describe "#attributes" do
+
+      it "errors since current_object is nil" do
+        expect {
+          node_wrap {
+            attributes(:name)
+          }
+        }.to raise_error(ArgumentError, ERROR_MESSAGES[:attributes_inferred_missing])
+      end
+
+    end
+
   end
 
-  it "raises an error when you use the block syntax with more than one attribute" do
-    expect {
-      node_wrap {
-        attributes(:one, :two) do |person|
-          "..."
+  context "a hash-arg root object node" do
+
+    def wrap(&block)
+      alex = Person.new('alex').tap { |p| p.age = 25; p }
+      Bldr::Node.new do
+        object(:person => alex, &block)
+      end
+    end
+
+    describe "#attribute" do
+
+      it "errors on 3 arguments" do
+        expect {
+          node_wrap {
+            attribute(:one, :two, :three)
+          }
+        }.to raise_error(ArgumentError, ERROR_MESSAGES[:attribute_more_than_two_arg])
+      end
+      it "errors on 2 arguments and a lambda" do
+        expect {
+          node_wrap {
+            attribute(:one, :two) do |person|
+              "..."
+            end
+          }
+        }.to raise_error(ArgumentError, ERROR_MESSAGES[:attribute_lambda_one_argument])
+      end
+      it "renders 1 argument to the inferred object" do
+        node = wrap { attribute(:name) }
+        node.render!.should == {:person => {:name => 'alex'}}
+      end
+      it "renders 1 argument hash to the inferred object as the different key" do
+        node = wrap { attribute(:fake => :name) }
+        node.render!.should == {:person => {:fake => 'alex'}}
+      end
+      it "renders 2 arguments statically" do
+        node = wrap { attribute(:name, "ian") }
+        node.render!.should == {:person => {:name => 'ian'}}
+      end
+      it "renders 1 argument and one lambda with zero arity" do
+        node = wrap { attribute(:name){"ian"} }
+        node.render!.should == {:person => {:name => 'ian'}}
+      end
+      it "renders 1 argument and one lambda with arity 1" do
+        node = wrap { attribute(:name){|person| person.name} }
+        node.render!.should == {:person => {:name => 'alex'}}
+      end
+      it "renders nil attributes" do
+        node = node_wrap do
+          object :person => Person.new('alex') do
+            attribute :age
+          end
         end
-      }
-    }.to raise_error(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.")
-  end
 
-  it "returns nil attributes in the result" do
-    node = node_wrap do
-      object :person => Person.new('alex') do
-        attributes :name, :age
+        node.render!.should == {:person => {:age => nil}}
       end
+
     end
 
-    node.render!.should == {:person => {:name => 'alex', :age => nil}}
+    describe "#attributes" do
+
+      it "errors if the current_object is nil" do
+        expect {
+          node = node_wrap do
+            object(:person => nil) do
+              attributes(:one, :two) do |person|
+                "..."
+              end
+            end
+          end
+        }.to raise_error(ArgumentError, ERROR_MESSAGES[:attributes_inferred_missing])
+      end
+      it "renders each argument against the inferred object" do
+        node = wrap { attributes(:name, :age) }
+        node.render!.should == {:person => {:name => 'alex', :age => 25}}
+      end
+      it "renders nil attributes" do
+        node = node_wrap do
+          object :person => Person.new('alex') do
+            attributes :name, :age
+          end
+        end
+
+        node.render!.should == {:person => {:name => 'alex', :age => nil}}
+      end
+
+    end
+
+  end
+
+  describe "embedded objects" do
+    it "evaluates the block and returns json" do
+      node = Bldr::Node.new
+      result = node.object(:dude => Person.new("alex")) do
+        attributes :name
+
+        object(:bro => Person.new("john")) do
+          attributes :name
+        end
+      end
+
+      result.should == jsonify({
+        :dude => {:name => 'alex', :bro => {:name => 'john'}}
+      })
+    end
   end
 
 end
@@ -120,23 +341,6 @@ describe "Node#render!" do
 
       node.render!.should == {:person => {:surname => 'alex', :age => 25}}
     end
-  end
-end
-
-describe "Node#object" do
-  it "evaluates the block and returns json" do
-    node = Bldr::Node.new
-    result = node.object(:dude => Person.new("alex")) do
-      attributes :name
-
-      object(:bro => Person.new("john")) do
-        attributes :name
-      end
-    end
-
-    result.should == jsonify({
-      :dude => {:name => 'alex', :bro => {:name => 'john'}}
-    })
   end
 end
 

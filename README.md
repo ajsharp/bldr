@@ -65,7 +65,41 @@ end
 
 ## Examples
 
+### Rendering a basic object
+
+```ruby
+object do
+  attribute :title, "my title"
+end
+```
+
+Output:
+
+```javascript
+{
+  "title": "my title"
+}
+```
+
 ### Rendering a simple list of attributes
+
+```ruby
+object :post do
+  attribute :title, "my title"
+end
+```
+
+Output:
+
+```javascript
+{
+  "post": {
+    "title": "my title"
+  }
+}
+```
+
+### Rendering a simple list of attributes from an object
 
 ```ruby
 object :post => post do
@@ -79,7 +113,7 @@ Output:
 {
   "post": {
     "title": "my title",
-      "body": "..."
+    "body": "..."
   }
 }
 ```

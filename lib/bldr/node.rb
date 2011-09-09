@@ -75,10 +75,13 @@ module Bldr
     #
     # @return [String] returns a json-encoded string of itself and all
     #   descendant nodes.
-    def object(hash = nil, &block)
-      if hash
-        key   = hash.keys.first
-        value = hash.values.first
+    def object(base = nil, &block)
+      if base.kind_of? Hash
+        key   = base.keys.first
+        value = base.values.first
+      else
+        key = base
+        value = nil
       end
 
       node  = Node.new(value, :parent => self, &block)
@@ -135,15 +138,7 @@ module Bldr
     #
     # @return [Nil]
     def attributes(*args, &block)
-      if block_given?
-        if args.size > 1
-          raise(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.")
-        end
-
-        merge_result!(args.first, (block.arity == 1) ? block.call(current_object) : current_object.instance_eval(&block))
-        return nil
-      end
-
+      raise(ArgumentError, "You cannot use #attributes when inferred object is not present.") if current_object.nil?
       args.each do |arg|
         if arg.is_a?(Hash)
           merge_result!(arg.keys.first, current_object.send(arg.values.first))
@@ -153,7 +148,29 @@ module Bldr
       end
       nil
     end
-    alias :attribute :attributes
+
+    def attribute(*args,&block)
+      if block_given?
+        raise(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.") if args.size > 1
+        raise(ArgumentError, "You cannot use a block of arity > 0 if inferred object is not present.") if block.arity > 0 and current_object.nil?
+        merge_result!(args.first, (block.arity == 1) ? block.call(current_object) : current_object.instance_eval(&block))
+      else
+        case args.size
+        when 1 # inferred object
+          raise(ArgumentError, "You cannot pass one argument to #attribute when inferred object is not present.") if current_object.nil?
+          if args[0].is_a?(Hash)
+            merge_result!(args[0].keys.first, current_object.send(args[0].values.first))
+          else
+            merge_result!(args[0], current_object.send(args[0]))
+          end
+        when 2 # static property
+          merge_result!(args[0], args[1])
+        else
+          raise(ArgumentError, "You cannot pass more than two arguments to #attribute.")
+        end
+      end
+      nil
+    end
 
     private
 
