@@ -135,15 +135,6 @@ module Bldr
     #
     # @return [Nil]
     def attributes(*args, &block)
-      if block_given?
-        if args.size > 1
-          raise(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.")
-        end
-
-        merge_result!(args.first, (block.arity == 1) ? block.call(current_object) : current_object.instance_eval(&block))
-        return nil
-      end
-
       args.each do |arg|
         if arg.is_a?(Hash)
           merge_result!(arg.keys.first, current_object.send(arg.values.first))
@@ -153,7 +144,26 @@ module Bldr
       end
       nil
     end
-    alias :attribute :attributes
+
+    def attribute(*args,&block)
+      if block_given?
+        if args.size > 1
+          raise(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.")
+        end
+        merge_result!(args.first, (block.arity == 1) ? block.call(current_object) : current_object.instance_eval(&block))
+      else
+        case args.size
+        when 1 # inferred object
+          raise(ArgumentError, "You cannot pass one argument to #attribute when inferred object is not present.") if current_object.nil?
+          merge_result!(args[0], current_object.send(args[0]))
+        when 2 # static property
+          merge_result!(args[0], args[1])
+        else
+          raise(ArgumentError, "You cannot pass more than two arguments to #attribute.")
+        end
+      end
+      nil
+    end
 
     private
 

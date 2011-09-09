@@ -36,7 +36,7 @@ describe "Node#attributes" do
   it "raises an error when you use the block syntax with more than one attribute" do
     expect {
       node_wrap {
-        attributes(:one, :two) do |person|
+        attribute(:one, :two) do |person|
           "..."
         end
       }

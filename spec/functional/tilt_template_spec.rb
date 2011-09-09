@@ -36,17 +36,61 @@ describe "evaluating a tilt template" do
     let(:alex) { Person.new('alex', 25) }
     let(:ian) { Person.new('ian', 32) }
 
-    it "returns json for a blank root object " do
-      tpl  = Bldr::Template.new {
-        <<-RUBY
-          object do
-            attribute(:url) {"http://google.com"}
-          end
-        RUBY
-      }
+    def it_renders_template_to_hash(template,hash)
+      tpl  = Bldr::Template.new {template}
       result = tpl.render(Bldr::Node.new)
-      result.should == jsonify({'url' => 'http://google.com'})
+      result.should == jsonify(hash)
     end
+
+    describe "attribute" do
+
+      it "renders two static attributes" do
+        tpl = %| object do
+                   attribute :url, "http://google.com"
+                 end |
+        it_renders_template_to_hash(tpl,{'url' => 'http://google.com'})
+      end
+
+      it "renders one attribute and one lambda" do
+        tpl = %| object do
+                   attribute(:url) {"http://google.com"}
+                 end |
+        it_renders_template_to_hash(tpl,{'url' => 'http://google.com'})
+      end
+
+      it "raises an error when only one argument is passed" do
+        tpl = %| object do
+                   attribute :url
+                 end |
+        expect {
+          it_renders_template_to_hash(tpl,{})
+        }.to raise_error(ArgumentError, "You cannot pass one argument to #attribute when inferred object is not present.")
+      end
+
+      it "raises an error when you send a lambda to an attribute with two arguments" do
+        tpl = %| object do
+                   attribute(:url,"http://foo.com") {"http://google.com"}
+                 end |
+        expect {
+          it_renders_template_to_hash(tpl,{})
+        }.to raise_error(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.")
+      end
+
+      it "raises an error when you send more than 2 arguments" do
+        tpl = %| object do
+                   attribute :url, :something, :something_else
+                 end |
+        expect {
+          it_renders_template_to_hash(tpl,{})
+        }.to raise_error(ArgumentError, "You cannot pass more than two arguments to #attribute.")
+      end
+
+    end
+
+    describe "attributes" do
+    end
+
+
 
     it "returns json for a root object" do
       tpl = Bldr::Template.new {
