@@ -24,4 +24,12 @@ RSpec.configure do |c|
   def jsonify(hash)
     Yajl::Encoder.encode(hash)
   end
+
+  # render the String template and compare to the jsonified hash
+  def it_renders_template_to_hash(template,hash)
+    tpl  = Bldr::Template.new {template}
+    result = tpl.render(Bldr::Node.new)
+    result.should == jsonify(hash)
+  end
+
 end

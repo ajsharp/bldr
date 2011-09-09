@@ -5,91 +5,103 @@ describe "evaluating a tilt template" do
     Tilt['test.bldr'].should == Bldr::Template
   end
 
-  it "renders a template" do
-    alex = Person.new
-    alex.name = 'alex'
+  # it "renders a template" do
+  #   alex = Person.new
+  #   alex.name = 'alex'
+  #
+  #   tpl = Bldr::Template.new { "object(:person => alex) { attribute(:name) }" }
+  #   tpl.render(Bldr::Node.new, :alex => alex).should == jsonify({:person => {:name => 'alex'}})
+  # end
 
-    tpl = Bldr::Template.new { "object(:person => alex) { attribute(:name) }" }
-    tpl.render(Bldr::Node.new, :alex => alex).should == jsonify({:person => {:name => 'alex'}})
-  end
+  # it "works when render two top-level objects" do
+  #   alex = Person.new('alex')
+  #   john = Person.new('john')
+  #
+  #   tpl = Bldr::Template.new {
+  #     <<-RUBY
+  #       object(:person_1 => alex) { attribute(:name) }
+  #       object(:person_2 => john) { attribute(:name) }
+  #     RUBY
+  #   }
+  #
+  #   result = tpl.render(Bldr::Node.new, :alex => alex, :john => john)
+  #   result.should == jsonify({
+  #     :person_1 => {:name => 'alex'},
+  #     :person_2 => {:name => 'john'}
+  #   })
+  # end
 
-  it "works when render two top-level objects" do
-    alex = Person.new('alex')
-    john = Person.new('john')
-
-    tpl = Bldr::Template.new {
-      <<-RUBY
-        object(:person_1 => alex) { attribute(:name) }
-        object(:person_2 => john) { attribute(:name) }
-      RUBY
-    }
-
-    result = tpl.render(Bldr::Node.new, :alex => alex, :john => john)
-    result.should == jsonify({
-      :person_1 => {:name => 'alex'},
-      :person_2 => {:name => 'john'}
-    })
-  end
-
-  describe "root Object nodes" do
+  describe "root object nodes" do
 
     let(:alex) { Person.new('alex', 25) }
     let(:ian) { Person.new('ian', 32) }
 
-    def it_renders_template_to_hash(template,hash)
-      tpl  = Bldr::Template.new {template}
-      result = tpl.render(Bldr::Node.new)
-      result.should == jsonify(hash)
+
+    describe "empty root Object key" do
+
+      describe "attribute" do
+
+        it "raises an error when only one argument is passed" do
+          tpl = %| object do
+                     attribute :url
+                   end |
+          expect {
+            it_renders_template_to_hash(tpl,{})
+          }.to raise_error(ArgumentError, "You cannot pass one argument to #attribute when inferred object is not present.")
+        end
+
+        it "raises an error when you send a lambda to an attribute with two arguments" do
+          tpl = %| object do
+                     attribute(:url,"http://foo.com") {"http://google.com"}
+                   end |
+          expect {
+            it_renders_template_to_hash(tpl,{})
+          }.to raise_error(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.")
+        end
+
+        it "raises an error when you send more than 2 arguments" do
+          tpl = %| object do
+                     attribute :url, :something, :something_else
+                   end |
+          expect {
+            it_renders_template_to_hash(tpl,{})
+          }.to raise_error(ArgumentError, "You cannot pass more than two arguments to #attribute.")
+        end
+
+        it "renders two static attributes" do
+          tpl = %| object do
+                     attribute :url, "http://google.com"
+                   end |
+          it_renders_template_to_hash(tpl,{'url' => 'http://google.com'})
+        end
+
+        it "renders one attribute and one lambda" do
+          tpl = %| object do
+                     attribute(:url) {"http://google.com"}
+                   end |
+          it_renders_template_to_hash(tpl,{'url' => 'http://google.com'})
+        end
+
+      end
+
+      describe "attributes" do
+
+        it "raises an error no matter the number of arguments" do
+          expect {
+            it_renders_template_to_hash(%| object do; attributes :url end |,{})
+          }.to raise_error(ArgumentError, "You cannot use #attributes when inferred object is not present.")
+        end
+
+        # it "renders a multiple arguments" do
+        #   tpl = %| object do
+        #              attribute :url, "http://google.com"
+        #            end |
+        #   it_renders_template_to_hash(tpl,{'url' => 'http://google.com'})
+        # end
+
+      end
+
     end
-
-    describe "attribute" do
-
-      it "renders two static attributes" do
-        tpl = %| object do
-                   attribute :url, "http://google.com"
-                 end |
-        it_renders_template_to_hash(tpl,{'url' => 'http://google.com'})
-      end
-
-      it "renders one attribute and one lambda" do
-        tpl = %| object do
-                   attribute(:url) {"http://google.com"}
-                 end |
-        it_renders_template_to_hash(tpl,{'url' => 'http://google.com'})
-      end
-
-      it "raises an error when only one argument is passed" do
-        tpl = %| object do
-                   attribute :url
-                 end |
-        expect {
-          it_renders_template_to_hash(tpl,{})
-        }.to raise_error(ArgumentError, "You cannot pass one argument to #attribute when inferred object is not present.")
-      end
-
-      it "raises an error when you send a lambda to an attribute with two arguments" do
-        tpl = %| object do
-                   attribute(:url,"http://foo.com") {"http://google.com"}
-                 end |
-        expect {
-          it_renders_template_to_hash(tpl,{})
-        }.to raise_error(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.")
-      end
-
-      it "raises an error when you send more than 2 arguments" do
-        tpl = %| object do
-                   attribute :url, :something, :something_else
-                 end |
-        expect {
-          it_renders_template_to_hash(tpl,{})
-        }.to raise_error(ArgumentError, "You cannot pass more than two arguments to #attribute.")
-      end
-
-    end
-
-    describe "attributes" do
-    end
-
 
 
     it "returns json for a root object" do
