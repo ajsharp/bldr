@@ -1,12 +1,12 @@
 require 'spec_helper'
 
-describe "Node#object" do
+ERROR_MESSAGES = { :attribute_lambda_one_argument              => "You may only pass one argument to #attribute when using the block syntax.",
+                   :attribute_inferred_missing_one_argument    => "You cannot pass one argument to #attribute when inferred object is not present.",
+                   :attribute_more_than_two_arg                => "You cannot pass more than two arguments to #attribute.",
+                   :attribute_inferred_missing_arity_too_large => "You cannot use a block of arity > 0 if inferred object is not present.",
+                   :attributes_inferred_missing                => "You cannot use #attributes when inferred object is not present." }
 
-  ERROR_MESSAGES = { :attribute_lambda_one_argument              => "You may only pass one argument to #attribute when using the block syntax.",
-                     :attribute_inferred_missing_one_argument    => "You cannot pass one argument to #attribute when inferred object is not present.",
-                     :attribute_more_than_two_arg                => "You cannot pass more than two arguments to #attribute.",
-                     :attribute_inferred_missing_arity_too_large => "You cannot use a block of arity > 0 if inferred object is not present.",
-                     :attributes_inferred_missing                => "You cannot use #attributes when inferred object is not present." }
+describe "Node#object" do
 
   context "a zero arg root object node" do
 
@@ -257,6 +257,23 @@ describe "Node#object" do
 
   end
 
+  describe "embedded objects" do
+    it "evaluates the block and returns json" do
+      node = Bldr::Node.new
+      result = node.object(:dude => Person.new("alex")) do
+        attributes :name
+
+        object(:bro => Person.new("john")) do
+          attributes :name
+        end
+      end
+
+      result.should == jsonify({
+        :dude => {:name => 'alex', :bro => {:name => 'john'}}
+      })
+    end
+  end
+
 end
 
 describe "Node#render!" do
@@ -324,23 +341,6 @@ describe "Node#render!" do
 
       node.render!.should == {:person => {:surname => 'alex', :age => 25}}
     end
-  end
-end
-
-describe "Node#object" do
-  it "evaluates the block and returns json" do
-    node = Bldr::Node.new
-    result = node.object(:dude => Person.new("alex")) do
-      attributes :name
-
-      object(:bro => Person.new("john")) do
-        attributes :name
-      end
-    end
-
-    result.should == jsonify({
-      :dude => {:name => 'alex', :bro => {:name => 'john'}}
-    })
   end
 end
 
