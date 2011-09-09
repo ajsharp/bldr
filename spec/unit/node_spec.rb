@@ -192,6 +192,7 @@ describe "Node#collection" do
     }
   end
 
+  # @todo fix this
   it "renders properly when a collection is the root node" do
     nodes = node_wrap do
       collection :people => [Person.new('bert'), Person.new('ernie')] do
