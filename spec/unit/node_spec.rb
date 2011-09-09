@@ -202,6 +202,26 @@ describe "Node#collection" do
     nodes.render!.should == {:people => [{:name => 'bert'}, {:name => 'ernie'}]}
   end
 
+  it "gracefully handles empty collections" do
+    nodes = node_wrap do
+      collection :people => [] do
+        attributes :name
+      end
+    end
+
+    nodes.render!.should == {:people => []}
+  end
+
+  it "gracefully handles nil collections" do
+    nodes = node_wrap do
+      collection :people => nil do
+        attributes :name
+      end
+    end
+
+    nodes.render!.should == {:people => []}
+  end
+
   it "renders nested collections properly" do
     post = Post.new("my post")
     post.comments << Comment.new('my comment')

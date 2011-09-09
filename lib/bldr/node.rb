@@ -90,7 +90,12 @@ module Bldr
       key   = items.keys.first
       values = items.values.to_a.first
 
-      merge_result! key, values.map{|item| Node.new(item, :parent => self, &block).render!}
+      vals = if values
+        values.map{|item| Node.new(item, :parent => self, &block).render!}
+      else
+        []
+      end
+      merge_result! key, vals
 
       self.to_json
     end
