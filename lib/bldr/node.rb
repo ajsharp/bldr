@@ -158,7 +158,11 @@ module Bldr
         case args.size
         when 1 # inferred object
           raise(ArgumentError, "You cannot pass one argument to #attribute when inferred object is not present.") if current_object.nil?
-          merge_result!(args[0], current_object.send(args[0]))
+          if args[0].is_a?(Hash)
+            merge_result!(args[0].keys.first, current_object.send(args[0].values.first))
+          else
+            merge_result!(args[0], current_object.send(args[0]))
+          end
         when 2 # static property
           merge_result!(args[0], args[1])
         else

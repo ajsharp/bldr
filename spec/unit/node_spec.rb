@@ -198,6 +198,10 @@ describe "Node#object" do
         node = wrap { attribute(:name) }
         node.render!.should == {:person => {:name => 'alex'}}
       end
+      it "renders 1 argument hash to the inferred object as the different key" do
+        node = wrap { attribute(:fake => :name) }
+        node.render!.should == {:person => {:fake => 'alex'}}
+      end
       it "renders 2 arguments statically" do
         node = wrap { attribute(:name, "ian") }
         node.render!.should == {:person => {:name => 'ian'}}
