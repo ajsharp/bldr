@@ -177,14 +177,24 @@ module Bldr
     # Merges values into the "local" result hash.
     def merge_result!(key, val)
       if key
-        result[key] = val
+        result[key] = massage_value(val)
       else
-        result.merge!(val)
+        result.merge!(massage_value(val))
       end
     end
 
     def append_result!(key, val)
-      result[key] << val
+      result[key] << massage_value(val)
+    end
+
+    # put any specializations in here
+    # @todo: add config handlers to specify your own overridable Class->lambda methods of serialization
+    def massage_value(val)
+      if val.kind_of? Time
+        val = val.utc.iso8601
+      else
+        val
+      end
     end
 
   end

@@ -71,6 +71,10 @@ describe "Node#object" do
           }
         }.to raise_error(ArgumentError, ERROR_MESSAGES[:attribute_inferred_missing_arity_too_large])
       end
+      it "should render null attributes to null, not 'null'" do
+        node = wrap { attribute(:name, nil) }
+        node.render!.should == {:name => nil}
+      end
 
     end
 
