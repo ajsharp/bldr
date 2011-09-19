@@ -290,6 +290,24 @@ get '/posts' do
 end
 ```
 
+### Custom Handlers
+
+Bldr supports the definition of custom handlers, based on the class of specific
+values in the result. You would make use of this to define how specific classes
+are rendered by Bldr at a global level.
+
+For example, the `BSON::ObjectId` class defines `to_json` and `as_json` methods
+that produce a result like the following: `{"$oid": "4e77a682364141ecf5000002"}`.
+If you wanted to over-ride this default format, you could do so by defining a
+custom handler:
+
+```ruby
+# place in a file that get's loaded before your application code
+Bldr.handler BSON::ObjectId do |val|
+  val.to_s # => "4e77a682364141ecf5000002"
+end
+```
+
 ## Editor Syntax Support
 
 To get proper syntax highlighting in vim, add this line to your .vimrc:
