@@ -8,6 +8,7 @@ describe "Defining different types of handlers" do
         "bar"
       end
     end
+
     it "uses the handler for Time when rendering" do
       output = "{\"foo\":\"bar\"}"
       node = Bldr::Node.new do
@@ -17,9 +18,5 @@ describe "Defining different types of handlers" do
       node.to_json.should == output
     end
   end
-
-  describe "Some other object" do
-  end
-
 
 end

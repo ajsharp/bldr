@@ -24,15 +24,3 @@ module Bldr
     end
   end
 end
-
-# Bldr.handler Time do |time|
-#   begin
-#     time.utc.iso8601
-#   rescue
-#     nil
-#   end
-# end
-#
-# Bldr.handler Mongoid::ObjectId do |object_id|
-#
-# end
