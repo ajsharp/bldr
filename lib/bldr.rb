@@ -8,8 +8,31 @@ require 'bldr/node'
 
 module Bldr
   class << self
+
     def json_encoder=(encoder)
       MultiJson.engine = encoder
     end
+    def handler(klass,&block)
+      raise(ArgumentError, "You must pass a Proc") if block.nil?
+      raise(ArgumentError, "You must pass only one argument to the Proc") unless block.arity == 1
+
+      handlers[klass] = block
+    end
+
+    def handlers
+      @handlers ||= {}
+    end
   end
 end
+
+# Bldr.handler Time do |time|
+#   begin
+#     time.utc.iso8601
+#   rescue
+#     nil
+#   end
+# end
+#
+# Bldr.handler Mongoid::ObjectId do |object_id|
+#
+# end

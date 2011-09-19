@@ -31,6 +31,17 @@ describe "evaluating a tilt template" do
     })
   end
 
+  it "renders nil -> null correctly" do
+    alex = Person.new('alex')
+    tpl = Bldr::Template.new {
+      <<-RUBY
+        object(:person_1 => alex) { attributes(:age) }
+      RUBY
+    }
+    result = tpl.render(Bldr::Node.new, :alex => alex)
+    result.should == %%{"person_1":{"age":null}}%
+  end
+
   describe "root Object nodes" do
 
     let(:alex) { Person.new('alex', 25) }
@@ -64,6 +75,19 @@ describe "evaluating a tilt template" do
       parse_json(result).should == {
         'person'=> {'name' => 'alex', 'age' => 25, 'friends' => [{'name' => 'ian', 'age' => 32}]}
       }
+    end
+
+    it "renders nil -> null correctly" do
+      alex = Person.new('alex')
+      tpl = Bldr::Template.new {
+        <<-RUBY
+          object :person_1 => alex do
+            attributes(:age)
+          end
+        RUBY
+      }
+      result = tpl.render(Bldr::Node.new, :alex => alex)
+      result.should == %%{"person_1":{"age":null}}%
     end
 
   end
