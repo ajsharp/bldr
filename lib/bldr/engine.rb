@@ -7,6 +7,7 @@ module Bldr
     def initialize(template, options = {})
       @template, @options = template, options
       @result   = {}
+      @handlers = {}
     end
 
   end

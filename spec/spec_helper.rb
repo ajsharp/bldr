@@ -32,4 +32,9 @@ RSpec.configure do |c|
     result.should == jsonify(hash)
   end
 
+  c.after do
+    Bldr.handlers.clear
+  end
+
+
 end

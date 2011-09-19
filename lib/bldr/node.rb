@@ -190,8 +190,8 @@ module Bldr
     # put any specializations in here
     # @todo: add config handlers to specify your own overridable Class->lambda methods of serialization
     def massage_value(val)
-      if val.kind_of? Time
-        val = val.utc.iso8601
+      if block = Bldr.handlers[val.class]
+        return block.call(val)
       else
         val
       end
