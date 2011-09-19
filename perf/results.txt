@@ -6,3 +6,11 @@ Latest Tag: v0.2.0
                           user     system      total        real
 i = 1000
 node with collection  0.080000   0.000000   0.080000 (  0.076949)
+
+================================================================================
+Spec run time: 2011-09-19 13:48:53 -0700
+Git SHA: 09214bfe2c38107ba68dd4c14f17e81d4f5bef72
+Latest Tag: v0.2.0
+                          user     system      total        real
+i = 1000
+node with collection  0.070000   0.010000   0.080000 (  0.076655)
