@@ -6,6 +6,10 @@ require 'bldr/engine'
 require 'bldr/template'
 require 'bldr/node'
 
+if defined?(Rails) and Rails.version =~ /^3/
+  require 'bldr/railtie'
+end
+
 module Bldr
   class << self
 
