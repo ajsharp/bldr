@@ -10,6 +10,12 @@ module Sinatra
       #   The template may also be passed in as the block argument
       #   to this method, in which case, template argument is nil.
       #
+      # @example Render a template in a file
+      #   get '/users/:id' do
+      #     user = User.find(params['id'])
+      #     bldr :'users/public.bldr', :locals => {:user => user}
+      #   end
+      #
       # @param [Hash] opts a hash of options
       # @option opts [Hash] :locals a hash of local variables to be used in the template
       # @option
