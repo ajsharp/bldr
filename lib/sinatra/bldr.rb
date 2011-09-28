@@ -5,6 +5,11 @@ module Sinatra
   module Bldr
     module Helpers
 
+      # Wrapper for Tilt's `render` method
+      #
+      # We use this to properly set the scope the template gets rendered
+      # within to a `Bldr::Node` object and pass in local variables.
+      #
       # @param [String, Symbol] template the template to render
       #   Can be a relative file location or a string template.
       #   The template may also be passed in as the block argument
