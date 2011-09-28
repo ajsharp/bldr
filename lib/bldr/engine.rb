@@ -10,6 +10,14 @@ module Bldr
       @handlers = {}
     end
 
+    # Render the template
+    # We render the template by instance_eval-ing it in the context of a `Bldr::Node` object.
+    #
+    # @return [String] the json-encoded string of the template
+    def render
+      Node.new.instance_eval(template)
+    end
+
   end
 
 end
