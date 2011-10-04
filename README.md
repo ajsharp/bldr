@@ -9,6 +9,15 @@ the box -- Rails 3 support is planned for the near future.
 
 If you would like to contribute, pull requests with specs are warmly accepted :)
 
+## Why
+
+If you're building an API, `Model#to_json` just doesn't cut it. Besides the JSON
+representation of your models arguarbly being a presentation concern, trying
+to cram all of this logic into an `#as_json` method quickly turns into pure chaos.
+
+There are a few other json templating libraries available, but I wasn't satisfied with any
+of the DSL's. So I created Bldr.
+
 ## Features
 
 * Simple json templating DSL
