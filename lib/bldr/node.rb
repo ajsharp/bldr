@@ -84,6 +84,7 @@ module Bldr
         value = nil
       end
 
+      return nil if value.nil? and base.kind_of? Hash
       node  = Node.new(value, :parent => self, &block)
       merge_result!(key, node.render!)
       self.to_json
@@ -138,7 +139,10 @@ module Bldr
     #
     # @return [Nil]
     def attributes(*args, &block)
-      raise(ArgumentError, "You cannot use #attributes when inferred object is not present.") if current_object.nil?
+      if current_object.nil?
+        raise(ArgumentError, "You cannot use #attributes when inferred object is not present.")
+      end
+
       args.each do |arg|
         if arg.is_a?(Hash)
           merge_result!(arg.keys.first, current_object.send(arg.values.first))

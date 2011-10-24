@@ -231,9 +231,8 @@ describe "Node#object" do
     end
 
     describe "#attributes" do
-
-      it "errors if the current_object is nil" do
-        expect {
+      describe "when an object key is passed a null value" do
+        subject {
           node = node_wrap do
             object(:person => nil) do
               attributes(:one, :two) do |person|
@@ -241,8 +240,17 @@ describe "Node#object" do
               end
             end
           end
-        }.to raise_error(ArgumentError, ERROR_MESSAGES[:attributes_inferred_missing])
+        }
+
+        it "does not raise an inferred object error" do
+          expect {
+            subject
+          }.not_to raise_error(ArgumentError, ERROR_MESSAGES[:attributes_inferred_missing])
+        end
+
+        its(:result) { should == {} }
       end
+
       it "renders each argument against the inferred object" do
         node = wrap { attributes(:name, :age) }
         node.render!.should == {:person => {:name => 'alex', :age => 25}}
