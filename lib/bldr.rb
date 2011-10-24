@@ -1,6 +1,11 @@
 
 $:.unshift(File.dirname(File.expand_path(__FILE__)))
 
+begin
+  require 'tilt'
+rescue LoadError
+end
+
 require 'multi_json'
 require 'bldr/engine'
 require 'bldr/node'
