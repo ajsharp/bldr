@@ -1,10 +1,6 @@
 module ActionView
   module Template::Handlers
-
-    class Bldr < Template::Handler
-      include Compilable
-
-      self.default_format = Mime::JSON
+    class Bldr
 
       # Compile the template
       #
@@ -12,7 +8,7 @@ module ActionView
       #
       # @param [ActionView::Template] the actionview template
       # @return [String] the template string
-      def compile(template)
+      def self.call(template)
         source = template.source.inspect
         "Bldr::Engine.new(#{source}).render"
       end
