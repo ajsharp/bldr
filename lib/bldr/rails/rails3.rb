@@ -1,7 +1,6 @@
 module ActionView
   module Template::Handlers
     class Bldr
-      self.default_format = Mime::JSON
 
       # Compile the template
       #
