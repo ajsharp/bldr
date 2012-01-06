@@ -91,16 +91,27 @@ module Bldr
     end
 
     def collection(items, &block)
-      key   = items.keys.first
-      values = items.values.to_a.first
 
-      vals = if values
-        values.map{|item| Node.new(item, :parent => self, &block).render!}
+      if items.respond_to?('keys')
+        key = items.keys.first
+        values = items.values.to_a.first
       else
-        []
+        key = nil
+        values = items
       end
-      merge_result! key, vals
+      
+      vals = if values
+               values.map{|item| Node.new(item, :parent => self, &block).render!}
+             else
+               []
+             end
 
+      if items.respond_to?('keys')
+        merge_result! key, vals
+      else
+        @result = massage_value(vals)
+      end
+        
       self.to_json
     end
 

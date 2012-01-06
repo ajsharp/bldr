@@ -409,7 +409,7 @@ describe "Node#collection" do
   end
 
   # @todo fix this
-  it "renders properly when a collection is the root node" do
+  it "renders properly when a collection is the named root node" do
     nodes = node_wrap do
       collection :people => [Person.new('bert'), Person.new('ernie')] do
         attributes :name
@@ -417,6 +417,16 @@ describe "Node#collection" do
     end
 
     nodes.render!.should == {:people => [{:name => 'bert'}, {:name => 'ernie'}]}
+  end
+
+  it "renders properly when a collection is the root node" do
+    nodes = node_wrap do
+      collection [Person.new('bert'), Person.new('ernie')] do
+        attributes :name
+      end
+    end
+
+    nodes.render!.should == [{:name => 'bert'}, {:name => 'ernie'}]
   end
 
   it "gracefully handles empty collections" do
