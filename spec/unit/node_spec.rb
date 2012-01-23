@@ -1,10 +1,10 @@
 require 'spec_helper'
 
 ERROR_MESSAGES = { :attribute_lambda_one_argument              => "You may only pass one argument to #attribute when using the block syntax.",
-                   :attribute_inferred_missing_one_argument    => "You cannot pass one argument to #attribute when inferred object is not present.",
+                   :attribute_inferred_missing_one_argument    => "#attribute can't be used when there is no current_object.",
                    :attribute_more_than_two_arg                => "You cannot pass more than two arguments to #attribute.",
-                   :attribute_inferred_missing_arity_too_large => "You cannot use a block of arity > 0 if inferred object is not present.",
-                   :attributes_inferred_missing                => "You cannot use #attributes when inferred object is not present." }
+                   :attribute_inferred_missing_arity_too_large => "You cannot use a block of arity > 0 if current_object is not present.",
+                   :attributes_inferred_missing                => "No current_object to apply #attributes to." }
 
 describe "Node#object" do
 

@@ -151,7 +151,7 @@ module Bldr
     # @return [Nil]
     def attributes(*args, &block)
       if current_object.nil?
-        raise(ArgumentError, "You cannot use #attributes when inferred object is not present.")
+        raise(ArgumentError, "No current_object to apply #attributes to.")
       end
 
       args.each do |arg|
@@ -167,12 +167,12 @@ module Bldr
     def attribute(*args,&block)
       if block_given?
         raise(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.") if args.size > 1
-        raise(ArgumentError, "You cannot use a block of arity > 0 if inferred object is not present.") if block.arity > 0 and current_object.nil?
+        raise(ArgumentError, "You cannot use a block of arity > 0 if current_object is not present.") if block.arity > 0 and current_object.nil?
         merge_result!(args.first, (block.arity == 1) ? block.call(current_object) : current_object.instance_eval(&block))
       else
         case args.size
         when 1 # inferred object
-          raise(ArgumentError, "You cannot pass one argument to #attribute when inferred object is not present.") if current_object.nil?
+          raise(ArgumentError, "#attribute can't be used when there is no current_object.") if current_object.nil?
           if args[0].is_a?(Hash)
             merge_result!(args[0].keys.first, current_object.send(args[0].values.first))
           else
