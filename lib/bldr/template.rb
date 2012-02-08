@@ -21,6 +21,10 @@ module Bldr
     def precompiled_template(locals)
       data.to_s
     end
+    
+    def render(*args,&block)
+      super.to_json
+    end
 
   end
 

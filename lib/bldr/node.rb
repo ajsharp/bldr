@@ -87,7 +87,8 @@ module Bldr
       return nil if value.nil? and base.kind_of? Hash
       node  = Node.new(value, :parent => self, &block)
       merge_result!(key, node.render!)
-      self.to_json
+      
+      self
     end
 
     def collection(items, &block)
@@ -112,7 +113,7 @@ module Bldr
         @result = massage_value(vals)
       end
         
-      self.to_json
+      self
     end
 
     # Add attributes to the result hash in a variety of ways
@@ -161,7 +162,7 @@ module Bldr
           merge_result!(arg, current_object.send(arg))
         end
       end
-      nil
+      # nil
     end
 
     def attribute(*args,&block)
@@ -184,14 +185,15 @@ module Bldr
           raise(ArgumentError, "You cannot pass more than two arguments to #attribute.")
         end
       end
-      nil
+      # nil
     end
 
     def render(template,locals={})
       node = Bldr::Node.new
       node.instance_eval(Bldr::Template.new(template).data)
       result.merge!(node.render!)
-      self.to_json
+      # self.to_json
+      # raise Bldr::Template.new(template).render(self).class.to_s
     end
 
     private

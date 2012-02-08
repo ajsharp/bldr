@@ -271,18 +271,17 @@ describe "Node#object" do
 
   describe "embedded objects" do
     it "evaluates the block and returns json" do
-      node = Bldr::Node.new
-      result = node.object(:dude => Person.new("alex")) do
-        attributes :name
-
-        object(:bro => Person.new("john")) do
+      node = node_wrap do
+        object(:dude => Person.new("alex")) do
           attributes :name
+
+          object(:bro => Person.new("john")) do
+            attributes :name
+          end
         end
       end
 
-      result.should == jsonify({
-        :dude => {:name => 'alex', :bro => {:name => 'john'}}
-      })
+      node.render!.should == {:dude => {:name => 'alex', :bro => {:name => 'john'}}}
     end
   end
 
@@ -524,7 +523,7 @@ end
 describe "Node#partial" do
   it "includes the partial as a top level" do
     nodes = node_wrap do
-      render "spec/fixtures/partial.json.bldr"
+      render "spec/fixtures/partial"
     end
 
     nodes.render!.should == {:foo => "bar"}

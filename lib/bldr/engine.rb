@@ -15,6 +15,9 @@ module Bldr
     #
     # @return [String] the json-encoded string of the template
     def render
+      # node = Node.new
+      # node.instance_eval(Bldr::Template.new(template).data)
+      # node.render!
       Node.new.instance_eval(template)
     end
 
