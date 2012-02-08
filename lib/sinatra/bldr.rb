@@ -27,7 +27,8 @@ module Sinatra
       def bldr(template, opts = {}, &block)
         opts[:scope] = ::Bldr::Node.new
         locals = opts.delete(:locals)
-        render(:bldr, template, opts, locals, &block)
+        MultiJson.encode render(:bldr, template, opts, locals, &block).result    
+        # @todo add support for alternate formats, like plist
       end
     end
 

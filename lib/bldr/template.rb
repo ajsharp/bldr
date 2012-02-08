@@ -3,8 +3,8 @@ require 'tilt'
 module Bldr
 
   class Template < Tilt::Template
-    # attr_reader :engine
-    # self.default_mime_type = 'application/json'
+
+    self.default_mime_type = 'application/json'
 
     def initialize_engine
       require_template_library 'bldr'
@@ -15,13 +15,12 @@ module Bldr
     end
 
     def prepare
-      @engine = Bldr::Engine.new(data, options)
+      # We get NotImplementedError by Tilt when we don't have this method
     end
 
     def precompiled_template(locals)
       data.to_s
     end
-
   end
 
   Tilt.register 'bldr', Bldr::Template

@@ -10,7 +10,7 @@ describe "evaluating a tilt template" do
     alex.name = 'alex'
 
     tpl = Bldr::Template.new { "object(:person => alex) { attribute(:name) }" }
-    tpl.render(Bldr::Node.new, :alex => alex).should == jsonify({:person => {:name => 'alex'}})
+    tpl.render(Bldr::Node.new, :alex => alex).result.should == {:person => {:name => 'alex'}}
   end
 
   it "works when render two top-level objects" do
@@ -24,11 +24,11 @@ describe "evaluating a tilt template" do
       RUBY
     }
 
-    result = tpl.render(Bldr::Node.new, :alex => alex, :john => john)
-    result.should == jsonify({
+    result = tpl.render(Bldr::Node.new, :alex => alex, :john => john).result
+    result.should == {
       :person_1 => {:name => 'alex'},
       :person_2 => {:name => 'john'}
-    })
+    }
   end
 
   it "renders nil -> null correctly" do
@@ -38,8 +38,8 @@ describe "evaluating a tilt template" do
         object(:person_1 => alex) { attributes(:age) }
       RUBY
     }
-    result = tpl.render(Bldr::Node.new, :alex => alex)
-    result.should == %%{"person_1":{"age":null}}%
+    result = tpl.render(Bldr::Node.new, :alex => alex).result
+    result.should == {:person_1 => {:age => nil}}
   end
 
   describe "root Object nodes" do
@@ -55,8 +55,8 @@ describe "evaluating a tilt template" do
           end
         RUBY
       }
-      result = tpl.render(Bldr::Node.new, :alex => alex, :ian => ian)
-      parse_json(result).should == {'person' => {'name' => 'alex', 'age' => 25}}
+      result = tpl.render(Bldr::Node.new, :alex => alex, :ian => ian).result
+      result.should == {:person => {:name => 'alex', :age => 25}}
     end
 
     it "returns json for root object templates with nested collections" do
@@ -71,9 +71,9 @@ describe "evaluating a tilt template" do
           end
         RUBY
       }
-      result = tpl.render(Bldr::Node.new, :alex => alex, :friends => [ian])
-      parse_json(result).should == {
-        'person'=> {'name' => 'alex', 'age' => 25, 'friends' => [{'name' => 'ian', 'age' => 32}]}
+      result = tpl.render(Bldr::Node.new, :alex => alex, :friends => [ian]).result
+      result.should == {
+        :person=> {:name => 'alex', :age => 25, :friends => [{:name => 'ian', :age => 32}]}
       }
     end
 
@@ -86,8 +86,8 @@ describe "evaluating a tilt template" do
           end
         RUBY
       }
-      result = tpl.render(Bldr::Node.new, :alex => alex)
-      result.should == %%{"person_1":{"age":null}}%
+      result = tpl.render(Bldr::Node.new, :alex => alex).result
+      result.should == {:person_1 => {:age => nil}}
     end
 
   end
@@ -105,9 +105,9 @@ describe "evaluating a tilt template" do
           end
         RUBY
       }
-      result = tpl.render(Bldr::Node.new, :people => [alex,ian])
-      parse_json(result).should == {
-        'people'=> [{'name' => 'alex', 'age' => 25},{'name' => 'ian', 'age' => 32}]
+      result = tpl.render(Bldr::Node.new, :people => [alex,ian]).result
+      result.should == {
+        :people => [{:name => 'alex', :age => 25}, {:name => 'ian', :age => 32}]
       }
     end
 
@@ -122,16 +122,16 @@ describe "evaluating a tilt template" do
           end
         RUBY
       }
-      result = tpl.render(Bldr::Node.new, :people => [alex,ian])
-      parse_json(result).should == {
-        'people'=> [{
-          'name' => 'alex',
-          'age' => 25,
-          "friends" => [{"name" => 'bo', "age" => 33}]
+      result = tpl.render(Bldr::Node.new, :people => [alex,ian]).result
+      result.should == {
+        :people=> [{
+          :name => 'alex',
+          :age => 25,
+          :friends => [{:name => 'bo', :age => 33}]
         },{
-          'name' => 'ian',
-          'age' => 32,
-          "friends" => [{"name" => 'eric', "age" => 34}]
+          :name => 'ian',
+          :age => 32,
+          :friends => [{:name => 'eric', :age => 34}]
         }]
       }
     end

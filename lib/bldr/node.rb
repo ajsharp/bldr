@@ -27,20 +27,6 @@ module Bldr
       instance_eval(&block) if block_given?
     end
 
-    # Merge the local results into the ancestor result hash.
-    #
-    # @return [Hash]
-    def render!
-      result
-    end
-
-    # Return the json-encoded result hash.
-    #
-    # @return [String] the json-encoded result hash
-    def to_json
-      MultiJson.encode(result)
-    end
-
     # Create and render a node.
     #
     # @example A keyed object
@@ -86,8 +72,9 @@ module Bldr
 
       return nil if value.nil? and base.kind_of? Hash
       node  = Node.new(value, :parent => self, &block)
-      merge_result!(key, node.render!)
-      self.to_json
+      merge_result!(key, node.result)
+      
+      self
     end
 
     def collection(items, &block)
@@ -101,7 +88,7 @@ module Bldr
       end
       
       vals = if values
-               values.map{|item| Node.new(item, :parent => self, &block).render!}
+               values.map{|item| Node.new(item, :parent => self, &block).result}
              else
                []
              end
@@ -112,7 +99,7 @@ module Bldr
         @result = massage_value(vals)
       end
         
-      self.to_json
+      self
     end
 
     # Add attributes to the result hash in a variety of ways
@@ -161,7 +148,6 @@ module Bldr
           merge_result!(arg, current_object.send(arg))
         end
       end
-      nil
     end
 
     def attribute(*args,&block)
@@ -184,7 +170,22 @@ module Bldr
           raise(ArgumentError, "You cannot pass more than two arguments to #attribute.")
         end
       end
-      nil
+    end
+
+    # Render a template inline within a view
+    #
+    # @example Simple render
+    #   object :person => dude do
+    #     template "path/to/template"
+    #   end
+    # 
+    # @example Using locals
+    #   object :person => dude do
+    #     template "path/to/template", :locals => {:foo => 'bar'}
+    #   end
+    def template(template,options={})
+      locals = options[:locals] || options['locals']
+      merge_result! nil, Bldr::Template.new(template).render(self, locals).result
     end
 
     private
@@ -198,10 +199,6 @@ module Bldr
       end
     end
 
-    def append_result!(key, val)
-      result[key] << massage_value(val)
-    end
-
     # put any specializations in here
     # @todo: add config handlers to specify your own overridable Class->lambda methods of serialization
     def massage_value(val)
@@ -211,6 +208,6 @@ module Bldr
         val
       end
     end
-
+    
   end
 end
