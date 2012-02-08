@@ -522,11 +522,33 @@ describe "Node#collection" do
 end
 
 describe "Node#partial" do
-  it "should render the partial" do
+  it "includes the partial as a top level" do
     nodes = node_wrap do
-      partial "spec/fixtures/_partial.json.bldr"
+      partial "spec/fixtures/partial.json.bldr"
     end
 
     nodes.render!.should == {:foo => "bar"}
+  end
+  
+  it "includes the partial on a top level object" do
+    nodes = node_wrap do
+      object :container do
+        attribute(:blah) { "baz" }
+        partial "spec/fixtures/partial.json.bldr"
+      end
+    end
+
+    nodes.render!.should == {:container => {:blah => "baz", :foo => "bar"}}
+  end
+  
+  it "includes the partial on a top level collection" do
+    nodes = node_wrap do
+      collection :people => [Person.new('bert'), Person.new('ernie')] do
+        attribute(:blah) { "baz" }
+        partial "spec/fixtures/partial.json.bldr"
+      end
+    end
+
+    nodes.render!.should == {:people => [{:blah => "baz", :foo => 'bar'}, {:blah => "baz", :foo => 'bar'}]}
   end
 end
