@@ -1,4 +1,3 @@
-
 $:.unshift(File.dirname(File.expand_path(__FILE__)))
 
 begin
@@ -11,10 +10,6 @@ require 'bldr/node'
 
 if defined?(Tilt)
   require 'bldr/template'
-end
-
-if defined?(Rails) and Rails.version =~ /^3/
-  require 'bldr/railtie'
 end
 
 module Bldr
