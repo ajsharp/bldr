@@ -523,7 +523,7 @@ end
 describe "Node#partial" do
   it "includes the partial as a top level" do
     nodes = node_wrap do
-      render "spec/fixtures/partial.json.bldr"
+      template "spec/fixtures/partial.json.bldr"
     end
 
     nodes.render!.should == {:foo => "bar"}
@@ -533,7 +533,7 @@ describe "Node#partial" do
     nodes = node_wrap do
       object :container do
         attribute(:blah) { "baz" }
-        render "spec/fixtures/partial.json.bldr"
+        template "spec/fixtures/partial.json.bldr"
       end
     end
 
@@ -544,7 +544,7 @@ describe "Node#partial" do
     nodes = node_wrap do
       collection :people => [Person.new('bert'), Person.new('ernie')] do
         attribute(:blah) { "baz" }
-        render "spec/fixtures/partial.json.bldr"
+        template "spec/fixtures/partial.json.bldr"
       end
     end
 
@@ -556,7 +556,7 @@ describe "Node#partial" do
       object :container do
         object :sub do
           attribute(:blah) { "baz" }
-          render "spec/fixtures/partial.json.bldr"
+          template "spec/fixtures/partial.json.bldr"
         end
       end
     end
@@ -569,7 +569,7 @@ describe "Node#partial" do
       object :container do
         collection :people => [Person.new('bert'), Person.new('ernie')] do
           attribute(:blah) { "baz" }
-          render "spec/fixtures/partial.json.bldr"
+          template "spec/fixtures/partial.json.bldr"
         end
       end
     end
@@ -580,10 +580,10 @@ describe "Node#partial" do
   it "includes both the partials" do
     nodes = node_wrap do
       object :container do
-        render "spec/fixtures/partial.json.bldr"
+        template "spec/fixtures/partial.json.bldr"
         object :sub do
           attribute(:blah) { "baz" }
-          render "spec/fixtures/partial.json.bldr"
+          template "spec/fixtures/partial.json.bldr"
         end
       end
     end
