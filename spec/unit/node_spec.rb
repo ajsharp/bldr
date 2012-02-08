@@ -552,6 +552,19 @@ describe "Node#partial" do
     nodes.render!.should == {:people => [{:blah => "baz", :foo => 'bar'}, {:blah => "baz", :foo => 'bar'}]}
   end
   
+  it "includes the partial on a sub object" do
+    nodes = node_wrap do
+      object :container do
+        object :sub do
+          attribute(:blah) { "baz" }
+          partial "spec/fixtures/partial.json.bldr"
+        end
+      end
+    end
+
+    nodes.render!.should == {:container => {:sub => {:blah => "baz", :foo => "bar"}}}
+  end
+  
   it "includes the partial on a sub collection" do
     nodes = node_wrap do
       object :container do
@@ -564,4 +577,6 @@ describe "Node#partial" do
 
     nodes.render!.should == {:container => {:people => [{:blah => "baz", :foo => 'bar'}, {:blah => "baz", :foo => 'bar'}]}}
   end
+  
+  
 end
