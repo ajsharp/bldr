@@ -523,7 +523,7 @@ end
 describe "Node#partial" do
   it "includes the partial as a top level" do
     nodes = node_wrap do
-      render "spec/fixtures/partial"
+      render "spec/fixtures/partial.json.bldr"
     end
 
     nodes.render!.should == {:foo => "bar"}
