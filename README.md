@@ -63,7 +63,7 @@ au BufRead,BufNewFile *.bldr set filetype=ruby
 
 ## TODO
 
-* Rails 3 support
+* Rails 3 support.  An attempt for this was made for this but was reverted in e1cfd7fcbe130b316d95773d8c73ece4e247200e.  Feel free to take a shot.
 * Replace current_object with a block param for collection methods
 * XML support
 
