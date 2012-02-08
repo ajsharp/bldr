@@ -52,7 +52,7 @@ describe "Node#object" do
       end
       it "renders 2 arguments statically" do
         node = wrap { attribute(:name, "alex") }
-        node.render!.should == {:name => 'alex'}
+        node.result.should == {:name => 'alex'}
       end
       it "renders 1 argument and one lambda with zero arity" do
         node = wrap {
@@ -60,7 +60,7 @@ describe "Node#object" do
             "alex"
           end
         }
-        node.render!.should == {:name => 'alex'}
+        node.result.should == {:name => 'alex'}
       end
       it "errors on 1 argument and one lambda with arity 1" do
         expect {
@@ -73,7 +73,7 @@ describe "Node#object" do
       end
       it "should render null attributes to null, not 'null'" do
         node = wrap { attribute(:name, nil) }
-        node.render!.should == {:name => nil}
+        node.result.should == {:name => nil}
       end
 
     end
@@ -136,7 +136,7 @@ describe "Node#object" do
       end
       it "renders 2 arguments statically" do
         node = wrap { attribute(:name, "alex") }
-        node.render!.should == {:person => {:name => 'alex'}}
+        node.result.should == {:person => {:name => 'alex'}}
       end
       it "renders 1 argument and one lambda with zero arity" do
         node = wrap {
@@ -144,7 +144,7 @@ describe "Node#object" do
             "alex"
           end
         }
-        node.render!.should == {:person => {:name => 'alex'}}
+        node.result.should == {:person => {:name => 'alex'}}
       end
       it "errors on 1 argument and one lambda with arity 1" do
         expect {
@@ -200,23 +200,23 @@ describe "Node#object" do
       end
       it "renders 1 argument to the inferred object" do
         node = wrap { attribute(:name) }
-        node.render!.should == {:person => {:name => 'alex'}}
+        node.result.should == {:person => {:name => 'alex'}}
       end
       it "renders 1 argument hash to the inferred object as the different key" do
         node = wrap { attribute(:fake => :name) }
-        node.render!.should == {:person => {:fake => 'alex'}}
+        node.result.should == {:person => {:fake => 'alex'}}
       end
       it "renders 2 arguments statically" do
         node = wrap { attribute(:name, "ian") }
-        node.render!.should == {:person => {:name => 'ian'}}
+        node.result.should == {:person => {:name => 'ian'}}
       end
       it "renders 1 argument and one lambda with zero arity" do
         node = wrap { attribute(:name){"ian"} }
-        node.render!.should == {:person => {:name => 'ian'}}
+        node.result.should == {:person => {:name => 'ian'}}
       end
       it "renders 1 argument and one lambda with arity 1" do
         node = wrap { attribute(:name){|person| person.name} }
-        node.render!.should == {:person => {:name => 'alex'}}
+        node.result.should == {:person => {:name => 'alex'}}
       end
       it "renders nil attributes" do
         node = node_wrap do
@@ -225,7 +225,7 @@ describe "Node#object" do
           end
         end
 
-        node.render!.should == {:person => {:age => nil}}
+        node.result.should == {:person => {:age => nil}}
       end
 
     end
@@ -253,7 +253,7 @@ describe "Node#object" do
 
       it "renders each argument against the inferred object" do
         node = wrap { attributes(:name, :age) }
-        node.render!.should == {:person => {:name => 'alex', :age => 25}}
+        node.result.should == {:person => {:name => 'alex', :age => 25}}
       end
       it "renders nil attributes" do
         node = node_wrap do
@@ -262,7 +262,7 @@ describe "Node#object" do
           end
         end
 
-        node.render!.should == {:person => {:name => 'alex', :age => nil}}
+        node.result.should == {:person => {:name => 'alex', :age => nil}}
       end
 
     end
@@ -281,15 +281,15 @@ describe "Node#object" do
         end
       end
 
-      node.render!.should == {:dude => {:name => 'alex', :bro => {:name => 'john'}}}
+      node.result.should == {:dude => {:name => 'alex', :bro => {:name => 'john'}}}
     end
   end
 
 end
 
-describe "Node#render!" do
+describe "Node#result" do
   it "returns an empty hash when not passed an object" do
-    Bldr::Node.new.render!.should == {}
+    Bldr::Node.new.result.should == {}
   end
 
   it "a document with a single node with no nesting" do
@@ -299,7 +299,7 @@ describe "Node#render!" do
       end
     end
 
-    node.render!.should == {:person => {:name => 'alex'}}
+    node.result.should == {:person => {:name => 'alex'}}
   end
 
   it "works for multiple top-level objects" do
@@ -315,7 +315,7 @@ describe "Node#render!" do
       end
     end
 
-    node.render!.should == {:alex => {:name => 'alex'}, :john => {:name => 'john'}}
+    node.result.should == {:alex => {:name => 'alex'}, :john => {:name => 'john'}}
   end
 
   it "recursively renders nested objects" do
@@ -329,7 +329,7 @@ describe "Node#render!" do
       end
     end
 
-    node.render!.should == {
+    node.result.should == {
       :alex => {
         :name => 'alex',
         :friend => {:name => 'john'}
@@ -350,7 +350,7 @@ describe "Node#render!" do
         end
       end
 
-      node.render!.should == {:person => {:surname => 'alex', :age => 25}}
+      node.result.should == {:person => {:surname => 'alex', :age => 25}}
     end
   end
 end
@@ -399,7 +399,7 @@ describe "Node#collection" do
       end
     end
 
-    node.render!.should == {
+    node.result.should == {
       :person => {
         :name => 'alex', :age => 26,
         :friends => [{:name => 'john', :age => 24}, {:name => 'jeff', :age => 25}]
@@ -415,7 +415,7 @@ describe "Node#collection" do
       end
     end
 
-    nodes.render!.should == {:people => [{:name => 'bert'}, {:name => 'ernie'}]}
+    nodes.result.should == {:people => [{:name => 'bert'}, {:name => 'ernie'}]}
   end
 
   it "renders properly when a collection is the root node" do
@@ -425,7 +425,7 @@ describe "Node#collection" do
       end
     end
 
-    nodes.render!.should == [{:name => 'bert'}, {:name => 'ernie'}]
+    nodes.result.should == [{:name => 'bert'}, {:name => 'ernie'}]
   end
 
   it "gracefully handles empty collections" do
@@ -435,7 +435,7 @@ describe "Node#collection" do
       end
     end
 
-    nodes.render!.should == {:people => []}
+    nodes.result.should == {:people => []}
   end
 
   it "gracefully handles nil collections" do
@@ -445,7 +445,7 @@ describe "Node#collection" do
       end
     end
 
-    nodes.render!.should == {:people => []}
+    nodes.result.should == {:people => []}
   end
 
   it "renders nested collections properly" do
@@ -463,7 +463,7 @@ describe "Node#collection" do
       end
     end
 
-    nodes.render!.should == {
+    nodes.result.should == {
       :posts => [
         {:title => 'my post', :comment_count => 1, :comments => [{:body => 'my comment'}]}
       ]
@@ -488,7 +488,7 @@ describe "Node#collection" do
       end
     end
 
-    nodes.render!.should == {
+    nodes.result.should == {
       :posts => [
         {
           :title => 'post 1',
@@ -515,7 +515,7 @@ describe "Node#collection" do
       end
     end
 
-    node.render!.should == {:name => 'john doe', :age => 25}
+    node.result.should == {:name => 'john doe', :age => 25}
   end
 
 end
@@ -526,7 +526,7 @@ describe "Node#partial" do
       template "spec/fixtures/partial.json.bldr"
     end
 
-    nodes.render!.should == {:foo => "bar"}
+    nodes.result.should == {:foo => "bar"}
   end
   
   it "includes the partial on a top level object" do
@@ -537,7 +537,7 @@ describe "Node#partial" do
       end
     end
 
-    nodes.render!.should == {:container => {:blah => "baz", :foo => "bar"}}
+    nodes.result.should == {:container => {:blah => "baz", :foo => "bar"}}
   end
   
   it "includes the partial on a top level collection" do
@@ -548,7 +548,7 @@ describe "Node#partial" do
       end
     end
 
-    nodes.render!.should == {:people => [{:blah => "baz", :foo => 'bar'}, {:blah => "baz", :foo => 'bar'}]}
+    nodes.result.should == {:people => [{:blah => "baz", :foo => 'bar'}, {:blah => "baz", :foo => 'bar'}]}
   end
   
   it "includes the partial on a sub object" do
@@ -561,7 +561,7 @@ describe "Node#partial" do
       end
     end
 
-    nodes.render!.should == {:container => {:sub => {:blah => "baz", :foo => "bar"}}}
+    nodes.result.should == {:container => {:sub => {:blah => "baz", :foo => "bar"}}}
   end
   
   it "includes the partial on a sub collection" do
@@ -574,7 +574,7 @@ describe "Node#partial" do
       end
     end
 
-    nodes.render!.should == {:container => {:people => [{:blah => "baz", :foo => 'bar'}, {:blah => "baz", :foo => 'bar'}]}}
+    nodes.result.should == {:container => {:people => [{:blah => "baz", :foo => 'bar'}, {:blah => "baz", :foo => 'bar'}]}}
   end
   
   it "includes both the partials" do
@@ -588,7 +588,7 @@ describe "Node#partial" do
       end
     end
 
-    nodes.render!.should == {:container => {:foo => "bar", :sub => {:blah => "baz", :foo => "bar"}}}
+    nodes.result.should == {:container => {:foo => "bar", :sub => {:blah => "baz", :foo => "bar"}}}
   end
   
 end

@@ -27,13 +27,6 @@ module Bldr
       instance_eval(&block) if block_given?
     end
 
-    # Merge the local results into the ancestor result hash.
-    #
-    # @return [Hash]
-    def render!
-      result
-    end
-
     # Return the json-encoded result hash.
     #
     # @return [String] the json-encoded result hash
@@ -86,7 +79,7 @@ module Bldr
 
       return nil if value.nil? and base.kind_of? Hash
       node  = Node.new(value, :parent => self, &block)
-      merge_result!(key, node.render!)
+      append!(key, node.result)
       
       self
     end
@@ -102,13 +95,13 @@ module Bldr
       end
       
       vals = if values
-               values.map{|item| Node.new(item, :parent => self, &block).render!}
+               values.map{|item| Node.new(item, :parent => self, &block).result}
              else
                []
              end
 
       if items.respond_to?('keys')
-        merge_result! key, vals
+        append! key, vals
       else
         @result = massage_value(vals)
       end
@@ -157,41 +150,39 @@ module Bldr
 
       args.each do |arg|
         if arg.is_a?(Hash)
-          merge_result!(arg.keys.first, current_object.send(arg.values.first))
+          append!(arg.keys.first, current_object.send(arg.values.first))
         else
-          merge_result!(arg, current_object.send(arg))
+          append!(arg, current_object.send(arg))
         end
       end
-      # nil
     end
 
     def attribute(*args,&block)
       if block_given?
         raise(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.") if args.size > 1
         raise(ArgumentError, "You cannot use a block of arity > 0 if current_object is not present.") if block.arity > 0 and current_object.nil?
-        merge_result!(args.first, (block.arity == 1) ? block.call(current_object) : current_object.instance_eval(&block))
+        append!(args.first, (block.arity == 1) ? block.call(current_object) : current_object.instance_eval(&block))
       else
         case args.size
         when 1 # inferred object
           raise(ArgumentError, "#attribute can't be used when there is no current_object.") if current_object.nil?
           if args[0].is_a?(Hash)
-            merge_result!(args[0].keys.first, current_object.send(args[0].values.first))
+            append!(args[0].keys.first, current_object.send(args[0].values.first))
           else
-            merge_result!(args[0], current_object.send(args[0]))
+            append!(args[0], current_object.send(args[0]))
           end
         when 2 # static property
-          merge_result!(args[0], args[1])
+          append!(args[0], args[1])
         else
           raise(ArgumentError, "You cannot pass more than two arguments to #attribute.")
         end
       end
-      # nil
     end
 
     def template(template,locals={})
       node = Bldr::Node.new
       node.instance_eval(Bldr::Template.new(template).data)
-      result.merge!(node.render!)
+      result.merge!(node.result)
       # self.to_json
       # raise Bldr::Template.new(template).render(self).class.to_s
     end
@@ -199,16 +190,12 @@ module Bldr
     private
 
     # Merges values into the "local" result hash.
-    def merge_result!(key, val)
+    def append!(key, val)
       if key
         result[key] = massage_value(val)
       else
         result.merge!(massage_value(val))
       end
-    end
-
-    def append_result!(key, val)
-      result[key] << massage_value(val)
     end
 
     # put any specializations in here
