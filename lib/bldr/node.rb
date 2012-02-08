@@ -179,12 +179,12 @@ module Bldr
       end
     end
 
-    def template(template,locals={})
-      node = Bldr::Node.new
-      node.instance_eval(Bldr::Template.new(template).data)
-      result.merge!(node.result)
-      # self.to_json
-      # raise Bldr::Template.new(template).render(self).class.to_s
+    def template(template,options={})
+      # node = Bldr::Node.new
+      # node.instance_eval(Bldr::Template.new(template).render(locals))
+      # result.merge!(node.result)
+      locals = options[:locals] || options['locals']
+      result.merge!(Bldr::Template.new(template).render(self,locals).result)
     end
 
     private

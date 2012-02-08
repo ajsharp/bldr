@@ -1,0 +1,3 @@
+object :name => obj do
+  attribute :foo
+end

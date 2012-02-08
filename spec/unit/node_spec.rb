@@ -591,4 +591,12 @@ describe "Node#partial" do
     nodes.result.should == {:container => {:foo => "bar", :sub => {:blah => "baz", :foo => "bar"}}}
   end
   
+  it "includes the partial with the locals" do
+    Obj = Struct.new(:foo)
+    nodes = node_wrap do
+      template "spec/fixtures/partial_with_locals.json.bldr", :locals => {:obj => Obj.new('test')}
+    end
+
+    nodes.result.should == {:name => {:foo => 'test'}}
+  end
 end

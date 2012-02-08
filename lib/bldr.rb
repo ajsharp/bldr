@@ -7,7 +7,6 @@ rescue LoadError
 end
 
 require 'multi_json'
-require 'bldr/engine'
 require 'bldr/node'
 
 if defined?(Tilt)
