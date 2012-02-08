@@ -8,12 +8,12 @@ describe "Defining different types of handlers" do
         "bar"
       end
 
-      output = "{\"foo\":\"bar\"}"
+      output = {:foo => 'bar'}
       node = Bldr::Node.new do
         object { attribute(:foo) { Time.now } }
       end
 
-      node.to_json.should == output
+      node.result.should == output
     end
   end
 

@@ -367,12 +367,12 @@ describe "Node#to_json" do
       end
     end
 
-    node.to_json.should == jsonify({
+    node.result.should == {
       :person => {
         :name => 'alex',
         :friend => {:name => 'pete', :age => 30}
       }
-    })
+    }
   end
 
   it "returns null values for nil attributes" do
@@ -382,8 +382,8 @@ describe "Node#to_json" do
       end
     end
 
-    parse_json(node.to_json)['person'].should have_key('age')
-    parse_json(node.to_json)['person']['age'].should be_nil
+    node.result[:person].should have_key(:age)
+    node.result[:person][:age].should be_nil
   end
 end
 

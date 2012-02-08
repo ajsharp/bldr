@@ -27,13 +27,6 @@ module Bldr
       instance_eval(&block) if block_given?
     end
 
-    # Return the json-encoded result hash.
-    #
-    # @return [String] the json-encoded result hash
-    def to_json
-      MultiJson.encode(result)
-    end
-
     # Create and render a node.
     #
     # @example A keyed object
