@@ -184,7 +184,7 @@ module Bldr
       # node.instance_eval(Bldr::Template.new(template).render(locals))
       # result.merge!(node.result)
       locals = options[:locals] || options['locals']
-      result.merge!(Bldr::Template.new(template).render(self,locals).result)
+      result.merge! Bldr::Template.new(template).render(self, locals).result
     end
 
     private
