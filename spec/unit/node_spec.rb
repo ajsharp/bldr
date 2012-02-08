@@ -562,6 +562,6 @@ describe "Node#partial" do
       end
     end
 
-    nodes.render!.should == {:collection => {:people => [{:blah => "baz", :foo => 'bar'}, {:blah => "baz", :foo => 'bar'}]}}
+    nodes.render!.should == {:container => {:people => [{:blah => "baz", :foo => 'bar'}, {:blah => "baz", :foo => 'bar'}]}}
   end
 end
