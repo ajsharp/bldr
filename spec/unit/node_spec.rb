@@ -551,4 +551,17 @@ describe "Node#partial" do
 
     nodes.render!.should == {:people => [{:blah => "baz", :foo => 'bar'}, {:blah => "baz", :foo => 'bar'}]}
   end
+  
+  it "includes the partial on a sub collection" do
+    nodes = node_wrap do
+      object :container do
+        collection :people => [Person.new('bert'), Person.new('ernie')] do
+          attribute(:blah) { "baz" }
+          partial "spec/fixtures/partial.json.bldr"
+        end
+      end
+    end
+
+    nodes.render!.should == {:collection => {:people => [{:blah => "baz", :foo => 'bar'}, {:blah => "baz", :foo => 'bar'}]}}
+  end
 end
