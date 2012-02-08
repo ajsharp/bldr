@@ -187,7 +187,7 @@ module Bldr
       nil
     end
 
-    def partial(template,locals={})
+    def render(template,locals={})
       node = Bldr::Node.new
       node.instance_eval(Bldr::Template.new(template).data)
       result.merge!(node.render!)
