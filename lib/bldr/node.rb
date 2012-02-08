@@ -187,6 +187,13 @@ module Bldr
       nil
     end
 
+    def partial(template,locals={})
+      node = Bldr::Node.new
+      node.instance_eval(Bldr::Template.new(template).data)
+      result.merge!(node.render!)
+      self.to_json
+    end
+
     private
 
     # Merges values into the "local" result hash.
@@ -211,6 +218,6 @@ module Bldr
         val
       end
     end
-
+    
   end
 end

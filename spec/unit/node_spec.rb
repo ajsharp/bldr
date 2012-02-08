@@ -520,3 +520,13 @@ describe "Node#collection" do
   end
 
 end
+
+describe "Node#partial" do
+  it "should render the partial" do
+    nodes = node_wrap do
+      partial "spec/fixtures/_partial.json.bldr"
+    end
+
+    nodes.render!.should == {:foo => "bar"}
+  end
+end
