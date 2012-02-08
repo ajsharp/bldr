@@ -179,9 +179,20 @@ module Bldr
       end
     end
 
+    # Render a template inline within a view
+    #
+    # @example Simple render
+    #   object :person => dude do
+    #     template "path/to/template"
+    #   end
+    # 
+    # @example Using locals
+    #   object :person => dude do
+    #     template "path/to/template", :locals => {:foo => 'bar'}
+    #   end
     def template(template,options={})
       locals = options[:locals] || options['locals']
-      result.merge! Bldr::Template.new(template).render(self, locals).result
+      merge_result! nil, Bldr::Template.new(template).render(self, locals).result
     end
 
     private
