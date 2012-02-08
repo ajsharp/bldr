@@ -15,19 +15,12 @@ module Bldr
     end
 
     def prepare
-      # @engine = Bldr::Engine.new(data, options)
+      # We get NotImplementedError by Tilt when we don't have this method
     end
 
     def precompiled_template(locals)
       data.to_s
     end
-    
-    def render(scope=Bldr::Node.new, locals={}, &block)
-      # super.send("to#{format}".to_sym)
-      # super.to_json
-      super
-    end
-
   end
 
   Tilt.register 'bldr', Bldr::Template
