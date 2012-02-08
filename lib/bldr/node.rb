@@ -79,7 +79,7 @@ module Bldr
 
       return nil if value.nil? and base.kind_of? Hash
       node  = Node.new(value, :parent => self, &block)
-      append!(key, node.result)
+      merge_result!(key, node.result)
       
       self
     end
@@ -101,7 +101,7 @@ module Bldr
              end
 
       if items.respond_to?('keys')
-        append! key, vals
+        merge_result! key, vals
       else
         @result = massage_value(vals)
       end
@@ -150,9 +150,9 @@ module Bldr
 
       args.each do |arg|
         if arg.is_a?(Hash)
-          append!(arg.keys.first, current_object.send(arg.values.first))
+          merge_result!(arg.keys.first, current_object.send(arg.values.first))
         else
-          append!(arg, current_object.send(arg))
+          merge_result!(arg, current_object.send(arg))
         end
       end
     end
@@ -161,18 +161,18 @@ module Bldr
       if block_given?
         raise(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.") if args.size > 1
         raise(ArgumentError, "You cannot use a block of arity > 0 if current_object is not present.") if block.arity > 0 and current_object.nil?
-        append!(args.first, (block.arity == 1) ? block.call(current_object) : current_object.instance_eval(&block))
+        merge_result!(args.first, (block.arity == 1) ? block.call(current_object) : current_object.instance_eval(&block))
       else
         case args.size
         when 1 # inferred object
           raise(ArgumentError, "#attribute can't be used when there is no current_object.") if current_object.nil?
           if args[0].is_a?(Hash)
-            append!(args[0].keys.first, current_object.send(args[0].values.first))
+            merge_result!(args[0].keys.first, current_object.send(args[0].values.first))
           else
-            append!(args[0], current_object.send(args[0]))
+            merge_result!(args[0], current_object.send(args[0]))
           end
         when 2 # static property
-          append!(args[0], args[1])
+          merge_result!(args[0], args[1])
         else
           raise(ArgumentError, "You cannot pass more than two arguments to #attribute.")
         end
@@ -190,7 +190,7 @@ module Bldr
     private
 
     # Merges values into the "local" result hash.
-    def append!(key, val)
+    def merge_result!(key, val)
       if key
         result[key] = massage_value(val)
       else
