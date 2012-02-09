@@ -599,4 +599,12 @@ describe "Node#partial" do
 
     nodes.result.should == {:name => {:foo => 'test'}}
   end
+  
+  it "raises an error when the partial isn't found" do
+    expect {
+      nodes = node_wrap do
+        template "unknown/path"
+      end
+    }.to raise_error(Errno::ENOENT)
+  end
 end
