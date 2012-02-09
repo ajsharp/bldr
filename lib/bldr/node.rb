@@ -72,7 +72,7 @@ module Bldr
       end
 
       return nil if value.nil? and base.kind_of? Hash
-      node  = Node.new(value, :parent => self, &block)
+      node  = Node.new(value, opts.merge(:parent => self), &block)
       merge_result!(key, node.result)
       
       self
@@ -89,7 +89,7 @@ module Bldr
       end
       
       vals = if values
-               values.map{|item| Node.new(item, :parent => self, &block).result}
+               values.map{|item| Node.new(item, opts.merge(:parent => self), &block).result}
              else
                []
              end
