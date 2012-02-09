@@ -607,4 +607,10 @@ describe "Node#partial" do
       end
     }.to raise_error(Errno::ENOENT)
   end
+  
+  it "doesn't raise an error when with a base path option specified and the right file" do
+    nodes = node_wrap nil, :views => 'spec/fixtures/some' do
+      template "include"
+    end
+  end
 end
