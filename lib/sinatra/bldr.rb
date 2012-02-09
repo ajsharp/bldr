@@ -25,7 +25,7 @@ module Sinatra
       # @option opts [Hash] :locals a hash of local variables to be used in the template
       # @option
       def bldr(template, opts = {}, &block)
-        opts[:scope] = ::Bldr::Node.new
+        opts[:scope] = ::Bldr::Node.new(nil,opts.merge(:views => (settings.views || "./views")))
         locals = opts.delete(:locals)
         MultiJson.encode render(:bldr, template, opts, locals, &block).result    
         # @todo add support for alternate formats, like plist

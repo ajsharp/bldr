@@ -3,7 +3,7 @@ module Bldr
 
   class Node
 
-    attr_reader :current_object, :result, :parent
+    attr_reader :current_object, :result, :parent, :opts, :views
 
     # Initialize a new Node instance.
     #
@@ -19,14 +19,15 @@ module Bldr
     # @param [Object] value an object to serialize.
     def initialize(value = nil, opts = {}, &block)
       @current_object = value
+      @opts           = opts
       @parent         = opts[:parent]
-
+      @views          = opts[:views]
       # Storage hash for all descendant nodes
       @result  = {}
 
       instance_eval(&block) if block_given?
     end
-
+    
     # Create and render a node.
     #
     # @example A keyed object
@@ -185,10 +186,18 @@ module Bldr
     #   end
     def template(template,options={})
       locals = options[:locals] || options['locals']
-      merge_result! nil, Bldr::Template.new(template).render(self, locals).result
+      merge_result! nil, Bldr::Template.new(find_template(template)).render(self, locals).result
     end
 
     private
+    
+    def find_template(template)
+      path = []
+      path << views if views
+      path << template
+      path << ".json.bldr" unless template =~ /\.json\.bldr$/
+      File.join(*path)
+    end
 
     # Merges values into the "local" result hash.
     def merge_result!(key, val)
