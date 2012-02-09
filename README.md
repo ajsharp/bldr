@@ -12,17 +12,16 @@ If you would like to contribute, pull requests with specs are warmly accepted :)
 ## Why
 
 If you're building an API, `Model#to_json` just doesn't cut it. Besides the JSON
-representation of your models arguarbly being a presentation concern, trying
+representation of your models arguably being a presentation concern, trying
 to cram all of this logic into an `#as_json` method quickly turns into pure chaos.
 
-There are a few other json templating libraries available, but I wasn't satisfied with any
-of the DSL's. So I created Bldr.
+There are other json templating libraries available -- [rabl](http://github.com/nesquena/rabl) being the most popular -- but I wasn't satisfied with any of the DSL's, so I created Bldr.
 
 ## Features
 
 * Simple json templating DSL
-* Uses Tilt's built-in rendering and template caching for better
-  performance
+* Uses Tilt's built-in rendering and template caching for better performance
+* Partials
 
 ## Installation
 
@@ -75,6 +74,7 @@ au BufRead,BufNewFile *.bldr set filetype=ruby
 ## Contributors
 
 * Ian Hunter (@ihunter)
+* Justin Smestad (@jsmestad)
 
 ## Copyright
 
