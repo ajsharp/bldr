@@ -17,7 +17,6 @@ describe "Node#object" do
     end
 
     describe "#attribute" do
-
       it "errors on a single argument" do
         expect {
           node_wrap {
@@ -27,6 +26,7 @@ describe "Node#object" do
           }
         }.to raise_error(ArgumentError, ERROR_MESSAGES[:attribute_lambda_one_argument])
       end
+
       it "errors on 3 arguments" do
         expect {
           node_wrap {
@@ -34,6 +34,7 @@ describe "Node#object" do
           }
         }.to raise_error(ArgumentError, ERROR_MESSAGES[:attribute_more_than_two_arg])
       end
+
       it "errors on 2 arguments and a lambda" do
         expect {
           node_wrap {
@@ -43,6 +44,7 @@ describe "Node#object" do
           }
         }.to raise_error(ArgumentError, ERROR_MESSAGES[:attribute_lambda_one_argument])
       end
+
       it "errors on 1 argument since there is no inferred object" do
         expect {
           node_wrap {
@@ -50,10 +52,12 @@ describe "Node#object" do
           }
         }.to raise_error(ArgumentError, ERROR_MESSAGES[:attribute_inferred_missing_one_argument])
       end
+
       it "renders 2 arguments statically" do
         node = wrap { attribute(:name, "alex") }
         node.result.should == {:name => 'alex'}
       end
+
       it "renders 1 argument and one lambda with zero arity" do
         node = wrap {
           attribute(:name) do
@@ -62,6 +66,7 @@ describe "Node#object" do
         }
         node.result.should == {:name => 'alex'}
       end
+
       it "errors on 1 argument and one lambda with arity 1" do
         expect {
           node_wrap {
@@ -71,15 +76,14 @@ describe "Node#object" do
           }
         }.to raise_error(ArgumentError, ERROR_MESSAGES[:attribute_inferred_missing_arity_too_large])
       end
+
       it "should render null attributes to null, not 'null'" do
         node = wrap { attribute(:name, nil) }
         node.result.should == {:name => nil}
       end
-
     end
 
     describe "#attributes" do
-
       it "errors since current_object is nil" do
         expect {
           node_wrap {
@@ -87,9 +91,7 @@ describe "Node#object" do
           }
         }.to raise_error(ArgumentError, ERROR_MESSAGES[:attributes_inferred_missing])
       end
-
     end
-
   end
 
   context "a single arg root object node" do
@@ -520,7 +522,7 @@ describe "Node#collection" do
 
 end
 
-describe "Node#partial" do
+describe "Node#template" do
   it "includes the partial as a top level" do
     nodes = node_wrap do
       template "spec/fixtures/partial.json.bldr"
