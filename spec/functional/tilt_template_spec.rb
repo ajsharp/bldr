@@ -13,6 +13,15 @@ describe "evaluating a tilt template" do
     tpl.render(Bldr::Node.new, :alex => alex).result.should == {:person => {:name => 'alex'}}
   end
 
+  it "allows attribute to be used at the root-level" do
+    tpl = Bldr::Template.new {
+      <<-RUBY
+        attribute(:foo) { "bar" }
+      RUBY
+    }
+    tpl.render(Bldr::Node.new(nil)).result.should == {:foo => 'bar'}
+  end
+
   it "works when render two top-level objects" do
     alex = Person.new('alex')
     john = Person.new('john')
