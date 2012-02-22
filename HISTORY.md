@@ -1,3 +1,8 @@
+## 0.5.3
+
+* Add ability to use `attribute` method at the root-level in a bldr template
+* Fix for when partials return nil (#19)
+
 ## 0.5.0 (2012-02-08)
 * Add support "partials" (@ihunter)
 
