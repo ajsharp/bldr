@@ -186,7 +186,10 @@ module Bldr
     #   end
     def template(template,options={})
       locals = options[:locals] || options['locals']
-      merge_result! nil, Bldr::Template.new(find_template(template)).render(self, locals).result
+
+      if tpl = Bldr::Template.new(find_template(template)).render(self, locals)
+        merge_result! nil, tpl.result
+      end
     end
 
     private
