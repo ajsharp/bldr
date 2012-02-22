@@ -183,6 +183,11 @@ describe "Node#object" do
     end
 
     describe "#attribute" do
+      it "works at the root level" do
+        node_wrap {
+          attribute(:foo) { "bar" }
+        }.result.should == {:foo => 'bar'}
+      end
 
       it "errors on 3 arguments" do
         expect {
