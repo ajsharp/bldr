@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  s.add_dependency 'multi_json', '~> 1.0.3'
+  s.add_dependency 'multi_json'
 
   s.add_development_dependency 'json_pure'
   s.add_development_dependency 'sinatra',   '~>1.2.6'
