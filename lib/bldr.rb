@@ -1,5 +1,3 @@
-$:.unshift(File.dirname(File.expand_path(__FILE__)))
-
 begin
   require 'tilt'
 rescue LoadError
