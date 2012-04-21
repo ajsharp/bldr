@@ -8,6 +8,8 @@ describe "Using Bldr with a sinatra app" do
     register Sinatra::Bldr
 
     set :views, File.expand_path(__FILE__ + '/../..')
+    disable :show_exceptions
+    enable  :raise_errors
 
     get '/' do
       alex =  Person.new("alex", 25)
