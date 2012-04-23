@@ -185,12 +185,16 @@ module Bldr
     #   object :person => dude do
     #     template "path/to/template", :locals => {:foo => 'bar'}
     #   end
-    def template(template,options={})
+    #
+    # @return [Bldr::Node] returns self
+    def template(template, options={})
       locals = options[:locals] || options['locals']
 
       if tpl = Bldr::Template.new(find_template(template)).render(self, locals)
         merge_result! nil, tpl.result
       end
+
+      self
     end
 
     private

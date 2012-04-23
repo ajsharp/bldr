@@ -147,3 +147,10 @@ describe "evaluating a tilt template" do
 
   end
 end
+
+describe "using a partial template at the root of another template" do
+  it "works as expected" do
+    template = Bldr::Template.new('./spec/fixtures/root_partial.bldr')
+    template.render(Bldr::Node.new(nil, :views => './spec')).result.should == {:foo => 'bar'}
+  end
+end

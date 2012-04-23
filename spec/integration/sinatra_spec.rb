@@ -51,6 +51,15 @@ describe "Using Bldr with a sinatra app" do
 
       bldr :'fixtures/root_template.json', :locals => {:name => name, :age => age}
     end
+
+    get '/root_partial' do
+      bldr :'fixtures/root_partial'
+    end
+  end
+
+  it "properly renders a template that only contains a template call" do
+    response = Rack::MockRequest.new(TestApp).get('/root_partial')
+    MultiJson.decode(response.body).should == {'foo' => 'bar'}
   end
 
   it "returns json for a simple single-level template" do
