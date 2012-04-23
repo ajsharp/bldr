@@ -60,8 +60,7 @@ module Bldr
     #   and the object to serialize.
     # @param [Proc] block the code block to evaluate
     #
-    # @return [String] returns a json-encoded string of itself and all
-    #   descendant nodes.
+    # @return [Bldr::Node] returns self
     def object(base = nil, &block)
       if base.kind_of? Hash
         key   = base.keys.first
@@ -78,6 +77,7 @@ module Bldr
       self
     end
 
+    # @return [Bldr::Node] returns self
     def collection(items, &block)
 
       if items.respond_to?('keys')
