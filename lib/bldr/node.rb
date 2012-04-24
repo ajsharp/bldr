@@ -3,7 +3,7 @@ module Bldr
 
   class Node
 
-    attr_reader :current_object, :result, :parent, :opts, :views
+    attr_reader :current_object, :result, :parent, :opts, :views, :locals
 
     # Initialize a new Node instance.
     #
@@ -22,6 +22,7 @@ module Bldr
       @opts           = opts
       @parent         = opts[:parent]
       @views          = opts[:views]
+      @locals         = opts[:locals]
       # Storage hash for all descendant nodes
       @result  = {}
 

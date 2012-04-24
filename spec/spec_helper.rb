@@ -3,12 +3,23 @@ require 'rspec'
 
 require 'yajl'
 require 'tilt'
+require 'sinatra/base'
 
 $:.unshift(File.dirname(File.expand_path(__FILE__)))
 
 require File.join(File.dirname(File.expand_path(__FILE__)), "..", "lib", "bldr")
 
 Dir['spec/models/*'].each { |f| require File.expand_path(f) }
+
+require 'sinatra/bldr'
+
+class BaseTestApp < Sinatra::Base
+  register Sinatra::Bldr
+
+  set :views, File.expand_path(__FILE__ + '/../..')
+  disable :show_exceptions
+  enable  :raise_errors
+end
 
 RSpec.configure do |c|
   def node_wrap(*args, &block)
@@ -35,6 +46,4 @@ RSpec.configure do |c|
   c.after do
     Bldr.handlers.clear
   end
-
-
 end

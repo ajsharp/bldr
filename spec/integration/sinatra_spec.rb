@@ -97,3 +97,25 @@ describe "Using Bldr with a sinatra app" do
     parse_json(response.body).should == {'name' => 'john doe', 'age' => 26}
   end
 end
+
+describe "access to the locals hash inside sinatra bldr templates" do
+  class Locals < BaseTestApp
+    disable :show_exceptions
+    enable  :raise_errors
+
+    get '/' do
+      tpl = <<-RUBY
+        object(:locals) do
+          attribute(:key) { locals[:key] }
+        end
+      RUBY
+
+      bldr tpl, :locals => {:key => 'val'}
+    end
+  end
+
+  it "provides access to the locals hash in the template" do
+    response = Rack::MockRequest.new(Locals).get('/')
+    MultiJson.decode(response.body)['locals']['key'].should == 'val'
+  end
+end

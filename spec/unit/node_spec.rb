@@ -623,3 +623,10 @@ describe "Node#template" do
     end
   end
 end
+
+describe "Node#locals" do
+  let(:node) { Bldr::Node.new({:foo => 'bar'}, :locals => {:key => 'val'})}
+  subject { node.locals }
+
+  it { should == {:key => 'val'} }
+end
