@@ -203,7 +203,7 @@ module Bldr
     def find_template(template)
       path = []
       path << views if views
-      template += ".json.bldr" unless template =~ /\.json\.bldr$/
+      template += ".json.bldr" unless template =~ /\.bldr$/
       path << template
       File.join(*path)
     end
