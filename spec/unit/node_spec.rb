@@ -6,6 +6,17 @@ ERROR_MESSAGES = { :attribute_lambda_one_argument              => "You may only 
                    :attribute_inferred_missing_arity_too_large => "You cannot use a block of arity > 0 if current_object is not present.",
                    :attributes_inferred_missing                => "No current_object to apply #attributes to." }
 
+describe "Node#attributes" do
+  let(:person) {
+    Person.new('john', 25)
+  }
+  let(:node) { Bldr::Node.new(person) }
+
+  it "returns stuff" do
+    node.attribute(:age).should == node
+  end
+end
+
 describe "Node#object" do
 
   context "a zero arg root object node" do

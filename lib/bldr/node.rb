@@ -150,6 +150,7 @@ module Bldr
           merge_result!(arg, current_object.send(arg))
         end
       end
+      self
     end
 
     def attribute(*args,&block)
@@ -157,7 +158,6 @@ module Bldr
         raise(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.") if args.size > 1
         raise(ArgumentError, "You cannot use a block of arity > 0 if current_object is not present.") if block.arity > 0 and current_object.nil?
         merge_result!(args.first, (block.arity == 1) ? block.call(current_object) : current_object.instance_eval(&block))
-        self
       else
         case args.size
         when 1 # inferred object
@@ -173,6 +173,7 @@ module Bldr
           raise(ArgumentError, "You cannot pass more than two arguments to #attribute.")
         end
       end
+      self
     end
 
     # Render a template inline within a view
