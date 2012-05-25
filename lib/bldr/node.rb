@@ -69,7 +69,7 @@ module Bldr
     # @return [Bldr::Node] returns self
     def object(base = nil, &block)
       if block_given?
-        if base.kind_of? Hash
+        if keyed_object?(base)
           key   = base.keys.first
           value = base.values.first
         else
@@ -77,7 +77,12 @@ module Bldr
           value = nil
         end
 
-        return nil if value.nil? and base.kind_of? Hash
+        # Short circuit here if the object passed in pointed
+        # at a nil value. There's some debate about how this
+        # should behave by default -- should it build the keyspace,
+        # pointing a null value, or should it leave the key out.
+        # With this implementation, it leaves the keyspace out.
+        return nil if value.nil? and keyed_object?(base)
 
         node  = Node.new(value, opts.merge(:parent => self), &block)
         merge_result!(key, node.result)
@@ -113,7 +118,7 @@ module Bldr
     def collection(items, &block)
 
       # Does this collection live in a key, or is it top-level?
-      if items.respond_to?('keys')
+      if keyed_object?(items)
         key = items.keys.first
         values = items.values.to_a.first
       else
@@ -133,7 +138,7 @@ module Bldr
         []
       end
 
-      if items.respond_to?('keys')
+      if keyed_object?(items)
         merge_result! key, vals
       else
         @result = massage_value(vals)
@@ -238,6 +243,16 @@ module Bldr
     end
 
     private
+
+    # Determines if an object was passed in with a key pointing to it, or if
+    # it was passed in as the "root" of the current object. Essentially, this
+    # checks if `obj` quacks like a hash.
+    #
+    # @param [Object] obj
+    # @return [Boolean]
+    def keyed_object?(obj)
+      obj.respond_to?(:keys)
+    end
     
     def find_template(template)
       path = []
