@@ -1,3 +1,7 @@
+## 0.5.5 (2012-05-15)
+* Bug: Allow .bldr extensions at the end of partial template names
+* Bug: `#attribute` DSL method returns self, allowing use at top level
+
 ## 0.5.4 (2012-04-24)
 * Fix bug to allow using `template` method at the root of a bldr template
 * Add `locals` reader method to allow access to locals passed into a bldr template
