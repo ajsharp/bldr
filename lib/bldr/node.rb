@@ -89,6 +89,7 @@ module Bldr
     # @return [Bldr::Node] returns self
     def collection(items, &block)
 
+      # Does this collection live in a key, or is it top-level?
       if items.respond_to?('keys')
         key = items.keys.first
         values = items.values.to_a.first
@@ -96,9 +97,11 @@ module Bldr
         key = nil
         values = items
       end
-      
+
       vals = if values
-               values.map{|item| Node.new(item, opts.merge(:parent => self), &block).result}
+               values.map do |item|
+                 Node.new(item, opts.merge(:parent => self), &block).result
+               end
              else
                []
              end
