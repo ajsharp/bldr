@@ -63,18 +63,23 @@ module Bldr
     #
     # @return [Bldr::Node] returns self
     def object(base = nil, &block)
-      if base.kind_of? Hash
-        key   = base.keys.first
-        value = base.values.first
+      if block_given?
+        if base.kind_of? Hash
+          key   = base.keys.first
+          value = base.values.first
+        else
+          key = base
+          value = nil
+        end
+
+        return nil if value.nil? and base.kind_of? Hash
+
+        node  = Node.new(value, opts.merge(:parent => self), &block)
+        merge_result!(key, node.result)
       else
-        key = base
-        value = nil
+        merge_result!(nil, base)
       end
 
-      return nil if value.nil? and base.kind_of? Hash
-      node  = Node.new(value, opts.merge(:parent => self), &block)
-      merge_result!(key, node.result)
-      
       self
     end
 

@@ -18,6 +18,15 @@ describe "Node#attributes" do
 end
 
 describe "Node#object" do
+  context "rendering an object exactly as it exists" do
+    it "renders the object exactly as it appears when passed an object with no block" do
+      obj = {'key' => 'val', 'nested' => {'key' => 'val'}}
+      node = node_wrap do
+        object obj
+      end
+      node.result.should == obj
+    end
+  end
 
   context "a zero arg root object node" do
 
