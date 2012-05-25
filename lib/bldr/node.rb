@@ -57,6 +57,11 @@ module Bldr
     #     attributes(:url) { url }
     #   end
     #
+    # @example "Pass-through" objects
+    #   object :person => person do
+    #     object :hobbies => hobbies
+    #   end
+    #
     # @param [Hash, Nil] hash a key/value pair indicating the output key name
     #   and the object to serialize.
     # @param [Proc] block the code block to evaluate
@@ -83,6 +88,24 @@ module Bldr
       self
     end
 
+    # Build a collection of objects, either passing each object
+    # into the block provided, or rendering the collection
+    # "pass-through", i.e. exactly as it appears.
+    #
+    # @example
+    #   object :person => person do
+    #     attributes :id, :name, :age
+    #
+    #     collection :friends => person.friends do
+    #       attributes :name, :age, :friend_count
+    #     end
+    #   end
+    #
+    # @example "Pass-through" collections
+    #   object :person => person do
+    #     collection :hobbies => hobbies
+    #   end
+    #
     # @param [Array, Hash] items Either an array of items, or a hash.
     #   If an array is passed in, the objects will be rendered at the
     #   "top level", i.e. without a key pointing to them.
