@@ -99,12 +99,16 @@ module Bldr
       end
 
       vals = if values
-               values.map do |item|
-                 Node.new(item, opts.merge(:parent => self), &block).result
-               end
-             else
-               []
-             end
+        if block_given?
+          values.map do |item|
+            Node.new(item, opts.merge(:parent => self), &block).result
+          end
+        else
+          values
+        end
+      else
+        []
+      end
 
       if items.respond_to?('keys')
         merge_result! key, vals
