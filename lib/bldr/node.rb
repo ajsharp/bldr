@@ -83,6 +83,9 @@ module Bldr
       self
     end
 
+    # @param [Array, Hash] items Either an array of items, or a hash.
+    #   If an array is passed in, the objects will be rendered at the
+    #   "top level", i.e. without a key pointing to them.
     # @return [Bldr::Node] returns self
     def collection(items, &block)
 
