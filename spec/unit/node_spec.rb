@@ -488,6 +488,26 @@ describe "Node#collection" do
     }
   end
 
+  it "renders objects nested in collections properly" do
+    posts = [Post.new("foo")]
+
+    nodes = node_wrap do
+      collection :data => posts do
+        attributes :title
+
+        object :meta => current_object.meta do
+          attributes :posted_at
+        end
+      end
+    end
+
+    nodes.result.should == {
+      :data => [
+        {:title => 'foo', :meta => {:posted_at => Time.new(0)}}
+      ]
+    }
+  end
+
   it "renders nested collections with dynamic property values correctly" do
     post1 = Post.new("post 1")
     post2 = Post.new("post 2")
