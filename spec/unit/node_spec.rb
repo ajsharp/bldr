@@ -522,21 +522,23 @@ describe "Node#collection" do
   end
 
   it "renders objects nested in collections properly" do
-    posts = [Post.new("foo")]
+    post = Post.new 'foo'
+    post.author = Author.new('John Doe')
+    posts = [post]
 
     nodes = node_wrap do
       collection :data => posts do
         attributes :title
 
-        object :meta => current_object.meta do
-          attributes :posted_at
+        object :author => current_object.author do
+          attributes :name
         end
       end
     end
 
     nodes.result.should == {
       :data => [
-        {:title => 'foo', :meta => {:posted_at => Time.new(0)}}
+        {:title => 'foo', :author => {:name => 'John Doe'}}
       ]
     }
   end

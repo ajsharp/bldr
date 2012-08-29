@@ -1,19 +1,12 @@
-class PostMetadata
-  attr_accessor :posted_at
-
-  def initialize(posted_at=Time.new(0))
-    @posted_at = posted_at
-  end
+class Author < Struct.new(:name)
 end
 
-
 class Post
-  attr_accessor :title, :body, :comments, :meta
+  attr_accessor :title, :body, :comments, :author
 
   def initialize(title = nil, body = nil)
     @title, @body = title, body
     @comments = []
-    @meta = PostMetadata.new
   end
 
 end
