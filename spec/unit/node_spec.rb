@@ -18,6 +18,15 @@ describe "Node#attributes" do
 end
 
 describe "Node#object" do
+  context "rendering an object exactly as it exists" do
+    it "renders the object exactly as it appears when passed an object with no block" do
+      obj = {'key' => 'val', 'nested' => {'key' => 'val'}}
+      node = node_wrap do
+        object obj
+      end
+      node.result.should == obj
+    end
+  end
 
   context "a zero arg root object node" do
 
@@ -406,6 +415,30 @@ describe "Node#to_json" do
 end
 
 describe "Node#collection" do
+  context "when passed an object with no block" do
+    it "renders the object exactly as it exists" do
+      coll = [{'key' => 'val'}]
+      node = node_wrap do
+        collection coll
+      end
+
+      node.result.should == coll
+    end
+
+    it "renders complex collection objects correctly" do
+      hobbies = [{'name' => "Gym"}, {'name' => "Tan"}, {'name' => "Laundry"}]
+
+      node = node_wrap do
+        object 'person' => Person.new("Alex") do
+          attribute :name
+          collection 'hobbies' => hobbies
+        end
+      end
+
+      node.result.should == {'person' => {:name => "Alex", 'hobbies' => hobbies}}
+    end
+  end
+
   it "iterates through the collection and renders them as nodes" do
     node = node_wrap do
       object :person => Person.new('alex', 26) do

@@ -57,45 +57,88 @@ module Bldr
     #     attributes(:url) { url }
     #   end
     #
+    # @example "Pass-through" objects
+    #   object :person => person do
+    #     object :hobbies => hobbies
+    #   end
+    #
     # @param [Hash, Nil] hash a key/value pair indicating the output key name
     #   and the object to serialize.
     # @param [Proc] block the code block to evaluate
     #
     # @return [Bldr::Node] returns self
     def object(base = nil, &block)
-      if base.kind_of? Hash
-        key   = base.keys.first
-        value = base.values.first
+      if block_given?
+        if keyed_object?(base)
+          key   = base.keys.first
+          value = base.values.first
+        else
+          key = base
+          value = nil
+        end
+
+        # Short circuit here if the object passed in pointed
+        # at a nil value. There's some debate about how this
+        # should behave by default -- should it build the keyspace,
+        # pointing a null value, or should it leave the key out.
+        # With this implementation, it leaves the keyspace out.
+        return nil if value.nil? and keyed_object?(base)
+
+        node  = Node.new(value, opts.merge(:parent => self), &block)
+        merge_result!(key, node.result)
       else
-        key = base
-        value = nil
+        merge_result!(nil, base)
       end
 
-      return nil if value.nil? and base.kind_of? Hash
-      node  = Node.new(value, opts.merge(:parent => self), &block)
-      merge_result!(key, node.result)
-      
       self
     end
 
+    # Build a collection of objects, either passing each object
+    # into the block provided, or rendering the collection
+    # "pass-through", i.e. exactly as it appears.
+    #
+    # @example
+    #   object :person => person do
+    #     attributes :id, :name, :age
+    #
+    #     collection :friends => person.friends do
+    #       attributes :name, :age, :friend_count
+    #     end
+    #   end
+    #
+    # @example "Pass-through" collections
+    #   object :person => person do
+    #     collection :hobbies => hobbies
+    #   end
+    #
+    # @param [Array, Hash] items Either an array of items, or a hash.
+    #   If an array is passed in, the objects will be rendered at the
+    #   "top level", i.e. without a key pointing to them.
     # @return [Bldr::Node] returns self
     def collection(items, &block)
 
-      if items.respond_to?('keys')
+      # Does this collection live in a key, or is it top-level?
+      if keyed_object?(items)
         key = items.keys.first
         values = items.values.to_a.first
       else
         key = nil
         values = items
       end
-      
-      vals = if values
-               values.map{|item| Node.new(item, opts.merge(:parent => self), &block).result}
-             else
-               []
-             end
 
-      if items.respond_to?('keys')
+      vals = if values
+        if block_given?
+          values.map do |item|
+            Node.new(item, opts.merge(:parent => self), &block).result
+          end
+        else
+          values
+        end
+      else
+        []
+      end
+
+      if keyed_object?(items)
         merge_result! key, vals
       else
         @result = massage_value(vals)
@@ -200,6 +243,16 @@ module Bldr
     end
 
     private
+
+    # Determines if an object was passed in with a key pointing to it, or if
+    # it was passed in as the "root" of the current object. Essentially, this
+    # checks if `obj` quacks like a hash.
+    #
+    # @param [Object] obj
+    # @return [Boolean]
+    def keyed_object?(obj)
+      obj.respond_to?(:keys)
+    end
     
     def find_template(template)
       path = []
