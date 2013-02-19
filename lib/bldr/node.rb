@@ -204,7 +204,7 @@ module Bldr
       if block_given?
         raise(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.") if args.size > 1
         raise(ArgumentError, "You cannot use a block of arity > 0 if current_object is not present.") if block.arity > 0 and current_object.nil?
-        merge_result!(args.first, (block.arity == 1) ? block.call(current_object) : current_object.instance_eval(&block))
+        merge_result! args.first, block.call(current_object)
       else
         case args.size
         when 1 # inferred object
