@@ -75,6 +75,7 @@ au BufRead,BufNewFile *.bldr set filetype=ruby
 
 * Ian Hunter (@ihunter)
 * Justin Smestad (@jsmestad)
+* Adam LaFave (@lafave)
 
 ## Copyright
 
