@@ -1,4 +1,4 @@
-[![Build Status](http://travis-ci.org/ajsharp/bldr.png)](http://travis-ci.org/ajsharp/bldr)
+[![Build Status](https://travis-ci.org/ajsharp/bldr.png)](https://travis-ci.org/ajsharp/bldr)
 
 
 # Bldr
