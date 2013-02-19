@@ -3,7 +3,7 @@ module Bldr
 
   class Node
 
-    PROTECTED_IVARS = [:@parent, :@opts, :@current_object, :@views, :@locals, :@result]
+    PROTECTED_IVARS = [:@current_object, :@result, :@parent, :@opts, :@views, :@locals]
 
     attr_reader :current_object, :result, :parent, :opts, :views, :locals
 
