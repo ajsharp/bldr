@@ -28,8 +28,8 @@ module Sinatra
 
         locals = opts.delete(:locals) || {}
 
-        MultiJson.encode render(:bldr, template, opts, locals, &block).result    
         # @todo add support for alternate formats, like plist
+        MultiJson.encode render(:bldr, template, opts, locals, &block).result
       end
     end
 
