@@ -34,7 +34,7 @@ module Bldr
 
       instance_eval(&block) if block_given?
     end
-    
+
     # Create and render a node.
     #
     # @example A keyed object
@@ -206,7 +206,11 @@ module Bldr
       if block_given?
         raise(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.") if args.size > 1
         raise(ArgumentError, "You cannot use a block of arity > 0 if current_object is not present.") if block.arity > 0 and current_object.nil?
-        merge_result! args.first, block.call(current_object)
+        if block.arity > 0
+          merge_result! args.first, block.call(current_object)
+        else
+          merge_result! args.first, block.call
+        end
       else
         case args.size
         when 1 # inferred object

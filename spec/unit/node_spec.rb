@@ -5,6 +5,7 @@ ERROR_MESSAGES = { :attribute_lambda_one_argument              => "You may only 
                   :attribute_more_than_two_arg                => "You cannot pass more than two arguments to #attribute.",
                   :attribute_inferred_missing_arity_too_large => "You cannot use a block of arity > 0 if current_object is not present.",
                   :attributes_inferred_missing                => "No current_object to apply #attributes to." }
+
 module Bldr
   describe Node, "#attributes" do
     let(:person) {
@@ -136,6 +137,11 @@ module Bldr
     end
 
     describe 'when in dynamic block form (with 1 argument and a block)' do
+      it 'sets the attribute default context to bldr node' do
+        node = Node.new { attribute(:key) { self.class } }
+        node.result[:key].should == ::Bldr::Node
+      end
+
       it "uses the argument as the key and the block result as the value" do
         node = Node.new {
           attribute(:name) do
