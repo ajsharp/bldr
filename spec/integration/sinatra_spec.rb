@@ -55,6 +55,16 @@ describe "Using Bldr with a sinatra app" do
     get '/root_partial' do
       bldr :'fixtures/root_partial'
     end
+
+    get '/ivar' do
+      @person = Person.new('bert', 99)
+      bldr :'fixtures/ivar'
+    end
+  end
+
+  it 'passes ivars through to the template' do
+    response = Rack::MockRequest.new(TestApp).get('/ivar')
+    decode(response.body).should == {'person' => {'name' => 'bert', 'age' => 99}}
   end
 
   it "properly renders a template that only contains a template call" do
