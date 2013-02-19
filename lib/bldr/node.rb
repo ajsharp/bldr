@@ -19,6 +19,8 @@ module Bldr
     #
     #
     # @param [Object] value an object to serialize.
+    # @param [Hash] opts
+    # @option [Object] opts :parent used to copy instance variables into self
     def initialize(value = nil, opts = {}, &block)
       @current_object = value
       @opts           = opts
