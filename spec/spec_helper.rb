@@ -30,6 +30,7 @@ RSpec.configure do |c|
   def parse_json(str)
     Yajl::Parser.parse(str)
   end
+  alias :decode :parse_json
 
   # Jsonify a ruby object
   def jsonify(hash)
