@@ -28,8 +28,9 @@ module Sinatra
         locals = opts.delete(:locals) || {}
 
         # copy local instance_variables to template
-        instance_variables.map(&:to_s).each { |var| locals[var] = instance_variable_get(var) }
+        instance_variables.map(&:to_s).each { |var| opts[:scope].instance_variable_set(var, instance_variable_get(var)) }
 
+        # render returns a `Bldr::Node` instance
         MultiJson.encode render(:bldr, template, opts, locals, &block).result    
         # @todo add support for alternate formats, like plist
       end
