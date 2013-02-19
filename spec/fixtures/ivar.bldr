@@ -1,0 +1,3 @@
+object :person => @person do
+  attributes :name, :age
+end
