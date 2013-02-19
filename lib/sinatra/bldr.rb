@@ -4,9 +4,6 @@ module Sinatra
 
   module Bldr
     module Helpers
-      # sinatra adds these instance variables by default
-      EXCLUDED_IVARS = [:@default_layout, :@app, :@template_cache, :@env, :@request, :@response, :@params, :@original_params, :@block_params]
-
       # Wrapper for Tilt's `render` method
       #
       # We use this to properly set the scope the template gets rendered
@@ -31,8 +28,7 @@ module Sinatra
         locals = opts.delete(:locals) || {}
 
         # copy local instance_variables to template
-        vars = self.instance_variables.map(&:to_s) - EXCLUDED_IVARS.map(&:to_s)
-        vars.each { |var| locals[var] = instance_variable_get(var) }
+        instance_variables.map(&:to_s).each { |var| locals[var] = instance_variable_get(var) }
 
         MultiJson.encode render(:bldr, template, opts, locals, &block).result    
         # @todo add support for alternate formats, like plist
