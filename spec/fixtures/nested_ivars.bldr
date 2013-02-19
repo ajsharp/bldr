@@ -1,0 +1,5 @@
+object nil do
+  object :person => @person do
+    attributes :name, :age
+  end
+end

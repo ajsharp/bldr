@@ -3,6 +3,8 @@ module Bldr
 
   class Node
 
+    PROTECTED_IVARS = [:@current_object, :@result, :@parent, :@opts, :@views, :@locals]
+
     attr_reader :current_object, :result, :parent, :opts, :views, :locals
 
     # Initialize a new Node instance.
@@ -17,6 +19,8 @@ module Bldr
     #
     #
     # @param [Object] value an object to serialize.
+    # @param [Hash] opts
+    # @option [Object] opts :parent used to copy instance variables into self
     def initialize(value = nil, opts = {}, &block)
       @current_object = value
       @opts           = opts
@@ -24,7 +28,9 @@ module Bldr
       @views          = opts[:views]
       @locals         = opts[:locals]
       # Storage hash for all descendant nodes
-      @result  = {}
+      @result         = {}
+
+      copy_instance_variables_from(opts[:parent]) if opts[:parent]
 
       instance_eval(&block) if block_given?
     end
@@ -200,7 +206,7 @@ module Bldr
       if block_given?
         raise(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.") if args.size > 1
         raise(ArgumentError, "You cannot use a block of arity > 0 if current_object is not present.") if block.arity > 0 and current_object.nil?
-        merge_result!(args.first, (block.arity == 1) ? block.call(current_object) : current_object.instance_eval(&block))
+        merge_result! args.first, block.call(current_object)
       else
         case args.size
         when 1 # inferred object
@@ -243,6 +249,17 @@ module Bldr
     end
 
     private
+
+    # Retrieves all instance variables from an object and sets them in the
+    #   current scope.
+    #
+    # @param [Object] object The object to copy instance variables from.
+    def copy_instance_variables_from(object)
+      ivar_names = (object.instance_variables - PROTECTED_IVARS).map(&:to_s)
+      ivar_names.map do |name|
+        instance_variable_set(name, object.instance_variable_get(name))
+      end
+    end
 
     # Determines if an object was passed in with a key pointing to it, or if
     # it was passed in as the "root" of the current object. Essentially, this
