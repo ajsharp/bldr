@@ -78,5 +78,5 @@ au BufRead,BufNewFile *.bldr set filetype=ruby
 
 ## Copyright
 
-Copyright (c) 2011-2012 Alex Sharp. See the MIT-LICENSE file for full
+Copyright (c) 2011-2013 Alex Sharp. See the MIT-LICENSE file for full
 copyright information.
