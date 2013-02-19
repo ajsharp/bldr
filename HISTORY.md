@@ -1,3 +1,7 @@
+## 0.6.1 (2013-02-18)
+* Feature: Add the ability to access instance variables set in sinatra
+  actions in bldr templates.
+
 ## 0.6.0 (2012-xx-xx)
 * Feature: Add the ability to pass-through objects directly to `object` and
   `collection` DSL methods
