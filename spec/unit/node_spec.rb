@@ -1,10 +1,10 @@
 require 'spec_helper'
 
 ERROR_MESSAGES = { :attribute_lambda_one_argument              => "You may only pass one argument to #attribute when using the block syntax.",
-                  :attribute_inferred_missing_one_argument    => "#attribute can't be used when there is no current_object.",
-                  :attribute_more_than_two_arg                => "You cannot pass more than two arguments to #attribute.",
-                  :attribute_inferred_missing_arity_too_large => "You cannot use a block of arity > 0 if current_object is not present.",
-                  :attributes_inferred_missing                => "No current_object to apply #attributes to." }
+  :attribute_inferred_missing_one_argument    => "#attribute can't be used when there is no current_object.",
+  :attribute_more_than_two_arg                => "You cannot pass more than two arguments to #attribute.",
+  :attribute_inferred_missing_arity_too_large => "You cannot use a block of arity > 0 if current_object is not present.",
+  :attributes_inferred_missing                => "No current_object to apply #attributes to." }
 
 module Bldr
   describe Node, "#attributes" do
@@ -165,6 +165,17 @@ module Bldr
   end
 
   describe Node, "#object" do
+    it 'is passes block the block variable to the block' do
+      denver = Person.new('John Denver')
+      node = Node.new do
+        object :person => denver do |jd|
+          attribute(:name) { jd.name }
+        end
+      end
+
+      node.result.should == {:person => {:name => 'John Denver'}}
+    end
+
     context "rendering an object exactly as it exists" do
       it "renders the object exactly as it appears when passed an object with no block" do
         obj = {'key' => 'val', 'nested' => {'key' => 'val'}}
@@ -323,11 +334,10 @@ module Bldr
       end
 
       node.result.should == {
-                             :alex => {
-                                       :name => 'alex',
-                                       :friend => {:name => 'john'}
-                                      }
-                            }
+        :alex => {
+          :name => 'alex', :friend => {:name => 'john'}
+        }
+      }
     end
 
     describe "#attributes syntax" do
@@ -361,11 +371,11 @@ module Bldr
       end
 
       node.result.should == {
-                             :person => {
-                                         :name => 'alex',
-                                         :friend => {:name => 'pete', :age => 30}
-                                        }
-                            }
+        :person => {
+          :name => 'alex',
+          :friend => {:name => 'pete', :age => 30}
+        }
+      }
     end
 
     it "returns null values for nil attributes" do
@@ -405,6 +415,29 @@ module Bldr
       end
     end
 
+    it "iterates through the collection and passes each item as a block variable" do
+      denver = Person.new('John Denver')
+      songs = [Song.new('Rocky Mountain High'), Song.new('Take Me Home, Country Roads')]
+
+      node = Node.new do
+        object :artist => denver do
+          attribute :name
+
+          collection :songs => songs do |song|
+            attribute(:name) { song.name }
+          end
+        end
+      end
+
+      node.result.should == {
+        :artist => {:name => 'John Denver',
+          :songs => [{:name => 'Rocky Mountain High'},
+            {:name => 'Take Me Home, Country Roads'}
+          ]
+        }
+      }
+    end
+
     it "iterates through the collection and renders them as nodes" do
       node = node_wrap do
         object :person => Person.new('alex', 26) do
@@ -417,11 +450,13 @@ module Bldr
       end
 
       node.result.should == {
-                             :person => {
-                                         :name => 'alex', :age => 26,
-                                         :friends => [{:name => 'john', :age => 24}, {:name => 'jeff', :age => 25}]
-                                        }
-                            }
+        :person => {
+          :name => 'alex', :age => 26,
+          :friends => [
+            {:name => 'john', :age => 24},
+            {:name => 'jeff', :age => 25}]
+        }
+      }
     end
 
     # @todo fix this
@@ -481,10 +516,10 @@ module Bldr
       end
 
       nodes.result.should == {
-                              :posts => [
-                                         {:title => 'my post', :comment_count => 1, :comments => [{:body => 'my comment'}]}
-                                        ]
-                             }
+        :posts => [
+          {:title => 'my post', :comment_count => 1, :comments => [{:body => 'my comment'}]}
+        ]
+      }
     end
 
     it "renders objects nested in collections properly" do
@@ -503,10 +538,10 @@ module Bldr
       end
 
       nodes.result.should == {
-                              :data => [
-                                        {:title => 'foo', :author => {:name => 'John Doe'}}
-                                       ]
-                             }
+        :data => [
+          {:title => 'foo', :author => {:name => 'John Doe'}}
+        ]
+      }
     end
 
     it "renders nested collections with dynamic property values correctly" do
@@ -528,19 +563,19 @@ module Bldr
       end
 
       nodes.result.should == {
-                              :posts => [
-                                         {
-                                          :title => 'post 1',
-                                          :comment_count => 1,
-                                          :comments => [{:body => 'post 1 comment'}]
-                                         },
-                                         {
-                                          :title => 'post 2',
-                                          :comment_count => 2,
-                                          :comments => [{:body => 'post 2 first comment'}, {:body => 'post 2 second comment'}]
-                                         }
-                                        ]
-                             }
+        :posts => [
+          {
+            :title => 'post 1',
+            :comment_count => 1,
+            :comments => [{:body => 'post 1 comment'}]
+          },
+          {
+            :title => 'post 2',
+            :comment_count => 2,
+            :comments => [{:body => 'post 2 first comment'}, {:body => 'post 2 second comment'}]
+          }
+        ]
+      }
     end
 
     it "allows root level attributes using local variables" do
