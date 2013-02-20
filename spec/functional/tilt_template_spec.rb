@@ -3,6 +3,19 @@ require 'spec_helper'
 module Bldr
   describe "instance variables" do
     let(:ctx) { Object.new }
+
+    it 'has access to instance variables in include template partials' do
+      ctx.instance_variable_set(:@person, Person.new('john denver'))
+
+      Template.new {
+        <<-RUBY
+         template('spec/fixtures/ivar.bldr')
+        RUBY
+      }.render(Node.new(nil, :parent => ctx))
+      .result
+      .should == {:person => {:name => 'john denver', :age => nil}}
+    end
+
     it 'has access to ivars in attribute blocks with no arity' do
       ctx.instance_variable_set(:@person, Person.new('john denver'))
 
