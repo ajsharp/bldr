@@ -567,7 +567,7 @@ module Bldr
 
       nodes.result.should == {:foo => "bar"}
     end
-    
+
     it "includes the partial on a top level object" do
       nodes = node_wrap do
         object :container do
@@ -578,7 +578,7 @@ module Bldr
 
       nodes.result.should == {:container => {:blah => "baz", :foo => "bar"}}
     end
-    
+
     it "includes the partial on a top level collection" do
       nodes = node_wrap do
         collection :people => [Person.new('bert'), Person.new('ernie')] do
@@ -589,7 +589,7 @@ module Bldr
 
       nodes.result.should == {:people => [{:blah => "baz", :foo => 'bar'}, {:blah => "baz", :foo => 'bar'}]}
     end
-    
+
     it "includes the partial on a sub object" do
       nodes = node_wrap do
         object :container do

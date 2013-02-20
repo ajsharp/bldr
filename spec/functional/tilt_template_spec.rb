@@ -1,5 +1,38 @@
 require 'spec_helper'
 
+module Bldr
+  describe "instance variables" do
+    let(:ctx) { Object.new }
+    it 'has access to ivars in attribute blocks with no arity' do
+      ctx.instance_variable_set(:@person, Person.new('john denver'))
+
+      Template.new {
+        <<-RUBY
+         object :person do
+           attribute(:name) { @person.name }
+         end
+        RUBY
+      }.render(Node.new(nil, :parent => ctx))
+        .result
+        .should == {:person => {:name => 'john denver'}}
+    end
+
+    it 'has access to ivars in attribute blocks with arity of 1' do
+      ctx.instance_variable_set(:@denver, Person.new('john denver'))
+      ctx.instance_variable_set(:@rich, Person.new('charlie rich'))
+      Template.new {
+        <<-RUBY
+         object :person => @denver do
+           attribute(:name) { |p| @rich.name }
+         end
+        RUBY
+      }.render(Node.new(nil, :parent => ctx))
+        .result
+        .should == {:person => {:name => 'charlie rich'}}
+    end
+  end
+end
+
 describe "evaluating a tilt template" do
   it "registers with Tilt" do
     Tilt['test.bldr'].should == Bldr::Template
