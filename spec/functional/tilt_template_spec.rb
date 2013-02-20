@@ -4,6 +4,22 @@ module Bldr
   describe "instance variables" do
     let(:ctx) { Object.new }
 
+    describe "collection blocks" do
+      it 'has access to instance variables' do
+        ctx.instance_variable_set(:@person, Person.new("John Denver"))
+
+        Template.new do
+          <<-RUBY
+            collection :artists => [@person] do
+              attribute(:name) { @person.name }
+            end
+          RUBY
+        end.render(Node.new(nil, :parent => ctx))
+        .result
+        .should == {:artists => [{:name => 'John Denver'}]}
+      end
+    end
+
     it 'has access to instance variables in include template partials' do
       ctx.instance_variable_set(:@person, Person.new('john denver'))
 
