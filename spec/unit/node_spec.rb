@@ -92,7 +92,6 @@ module Bldr
       end
 
       it "renders 1 argument and one lambda with zero arity" do
-        # @todo deprecate this behavior
         node = Node.new do
           object :person => Person.new('alex', 25) do
             attribute(:name) { 'ian' }
