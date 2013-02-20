@@ -41,6 +41,11 @@ module Bldr
       end
     end
 
+    def current_object
+      warn "[DEPRECATION] `current_object` is deprecated. Please use object or collection block varibles instead."
+      @current_object
+    end
+
     # Create and render a node.
     #
     # @example A keyed object
@@ -194,15 +199,15 @@ module Bldr
     #
     # @return [Nil]
     def attributes(*args, &block)
-      if current_object.nil?
+      if @current_object.nil?
         raise(ArgumentError, "No current_object to apply #attributes to.")
       end
 
       args.each do |arg|
         if arg.is_a?(Hash)
-          merge_result!(arg.keys.first, current_object.send(arg.values.first))
+          merge_result!(arg.keys.first, @current_object.send(arg.values.first))
         else
-          merge_result!(arg, current_object.send(arg))
+          merge_result!(arg, @current_object.send(arg))
         end
       end
       self
@@ -211,20 +216,20 @@ module Bldr
     def attribute(*args,&block)
       if block_given?
         raise(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.") if args.size > 1
-        raise(ArgumentError, "You cannot use a block of arity > 0 if current_object is not present.") if block.arity > 0 and current_object.nil?
+        raise(ArgumentError, "You cannot use a block of arity > 0 if current_object is not present.") if block.arity > 0 and @current_object.nil?
         if block.arity > 0
-          merge_result! args.first, block.call(current_object)
+          merge_result! args.first, block.call(@current_object)
         else
           merge_result! args.first, block.call
         end
       else
         case args.size
         when 1 # inferred object
-          raise(ArgumentError, "#attribute can't be used when there is no current_object.") if current_object.nil?
+          raise(ArgumentError, "#attribute can't be used when there is no current_object.") if @current_object.nil?
           if args[0].is_a?(Hash)
-            merge_result!(args[0].keys.first, current_object.send(args[0].values.first))
+            merge_result!(args[0].keys.first, @current_object.send(args[0].values.first))
           else
-            merge_result!(args[0], current_object.send(args[0]))
+            merge_result!(args[0], @current_object.send(args[0]))
           end
         when 2 # static property
           merge_result!(args[0], args[1])

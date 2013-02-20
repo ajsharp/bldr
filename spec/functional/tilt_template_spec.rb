@@ -185,9 +185,9 @@ module Bldr
       it "returns json for a root collection with embedded collection template" do
         tpl = Bldr::Template.new {
         <<-RUBY
-          collection :people => people do
+          collection :people => people do |person|
             attributes :name, :age
-            collection :friends => current_object.friends do
+            collection :friends => person.friends do
               attributes :name, :age
             end
           end

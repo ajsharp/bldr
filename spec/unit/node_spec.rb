@@ -505,11 +505,11 @@ module Bldr
       post.comments << Comment.new('my comment')
 
       nodes = node_wrap do
-        collection :posts => [post] do
+        collection :posts => [post] do |post|
           attributes :title
           attribute(:comment_count) { |post| post.comments.count }
 
-          collection :comments => current_object.comments do
+          collection :comments => post.comments do
             attributes :body
           end
         end
@@ -528,10 +528,10 @@ module Bldr
       posts = [post]
 
       nodes = node_wrap do
-        collection :data => posts do
+        collection :data => posts do |post|
           attributes :title
 
-          object :author => current_object.author do
+          object :author => post.author do
             attributes :name
           end
         end
@@ -552,11 +552,11 @@ module Bldr
       post2.comments << Comment.new('post 2 second comment')
 
       nodes = node_wrap do
-        collection :posts => [post1, post2] do
+        collection :posts => [post1, post2] do |post|
           attributes :title
           attribute(:comment_count) { |post| post.comments.count }
 
-          collection :comments => current_object.comments do
+          collection :comments => post.comments do
             attributes :body
           end
         end
@@ -696,5 +696,16 @@ module Bldr
     subject { node.locals }
 
     it { should == {:key => 'val'} }
+  end
+
+  describe Node, '#current_object' do
+    it 'returns the node value' do
+      Node.new('hey').current_object.should == 'hey'
+    end
+
+    it 'displays a deprecation warning' do
+      Object.any_instance.should_receive(:warn).with("[DEPRECATION] `current_object` is deprecated. Please use object or collection block varibles instead.")
+      Node.new.current_object
+    end
   end
 end
