@@ -74,7 +74,6 @@ module Bldr
       end
 
       it "renders 1 argument hash to the inferred object as the different key" do
-        # @todo remove this behavior -- it's unexpected and confusing
         node = Node.new do
           object :person => Person.new('alex', 25) do
             attribute(:fake => :name)
