@@ -165,6 +165,17 @@ module Bldr
   end
 
   describe Node, "#object" do
+    it 'is passes block the block variable to the block' do
+      denver = Person.new('John Denver')
+      node = Node.new do
+        object :person => denver do |jd|
+          attribute(:name) { jd.name }
+        end
+      end
+
+      node.result.should == {:person => {:name => 'John Denver'}}
+    end
+
     context "rendering an object exactly as it exists" do
       it "renders the object exactly as it appears when passed an object with no block" do
         obj = {'key' => 'val', 'nested' => {'key' => 'val'}}
