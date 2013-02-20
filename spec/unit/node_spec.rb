@@ -405,6 +405,29 @@ module Bldr
       end
     end
 
+    it "iterates through the collection and passes each item as a block variable" do
+      denver = Person.new('John Denver')
+      songs = [Song.new('Rocky Mountain High'), Song.new('Take Me Home, Country Roads')]
+
+      node = Node.new do
+        object :artist => denver do
+          attribute :name
+
+          collection :songs => songs do |song|
+            attribute(:name) { song.name }
+          end
+        end
+      end
+
+      node.result.should == {
+                             :artist => {:name => 'John Denver',
+                                         :songs => [{:name => 'Rocky Mountain High'},
+                                                    {:name => 'Take Me Home, Country Roads'}
+                                                   ]
+                                        }
+                            }
+    end
+
     it "iterates through the collection and renders them as nodes" do
       node = node_wrap do
         object :person => Person.new('alex', 26) do
@@ -419,7 +442,9 @@ module Bldr
       node.result.should == {
                              :person => {
                                          :name => 'alex', :age => 26,
-                                         :friends => [{:name => 'john', :age => 24}, {:name => 'jeff', :age => 25}]
+                                         :friends => [
+                                                      {:name => 'john', :age => 24},
+                                                      {:name => 'jeff', :age => 25}]
                                         }
                             }
     end

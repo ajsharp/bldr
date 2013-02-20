@@ -32,7 +32,13 @@ module Bldr
 
       copy_instance_variables_from(opts[:parent]) if opts[:parent]
 
-      instance_eval(&block) if block_given?
+      if block_given?
+        if value && block.arity > 0
+          instance_exec(value, &block)
+        else
+          instance_eval(&block)
+        end
+      end
     end
 
     # Create and render a node.
