@@ -37,7 +37,7 @@ module Bldr
       end
     end
 
-    it 'has access to instance variables in include template partials' do
+    it 'has access to instance variables in included template partials' do
       ctx.instance_variable_set(:@person, Person.new('john denver'))
 
       Template.new {
@@ -75,6 +75,24 @@ module Bldr
       }.render(Node.new(nil, :parent => ctx))
       .result
       .should == {:person => {:name => 'charlie rich'}}
+    end
+
+    it 'has access to ivars in nested object blocks' do
+      ctx.instance_variable_set(:@batman, Person.new('batman'))
+      ctx.instance_variable_set(:@bane, Person.new('bane'))
+      Template.new {
+        <<-RUBY
+         object :hero => @batman do
+           attribute(:name) { @batman.name }
+           object :nemesis do
+             attribute(:name) { @bane.name }
+             attribute(:nemesis_name) { @batman.name }
+           end
+         end
+        RUBY
+      }.render(Node.new(nil, :parent => ctx))
+      .result
+      .should == {hero: {name: 'batman', nemesis: {name: 'bane', nemesis_name: 'batman'}}}
     end
   end
 
