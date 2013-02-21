@@ -1,6 +1,23 @@
 require 'spec_helper'
 
 module Bldr
+  describe 'local variable access' do
+    it 'provides access to locals in nested object blocks' do
+      Template.new do
+          <<-RUBY
+            object :person => person do
+              attribute(:name) { person.name }
+              object :address => Object.new do |address|
+                attribute(:display_name) { person.name }
+              end
+            end
+          RUBY
+      end.render(Node.new(nil), {person: Person.new('alex')})
+      .result
+      .should == {:person => {:name => 'alex', :address => {:display_name => 'alex'}}}
+    end
+  end
+
   describe "instance variables" do
     let(:ctx) { Object.new }
 
