@@ -1,7 +1,8 @@
-## 0.7.0 (2013-xx-xx)
-* Support for inherited instance variables
+## 0.7.0 (2013-02-24)
+* Full support for instance variables
 * Breaking change: Node#attribute block syntax no longer inherits
   context from current_object. See 941608e7 for more
+* Block variables for `object` and `collection` methods
 * Breaking change: Drop ruby 1.8 support
 
 ## 0.6.1 (2013-02-18) -- yanked
