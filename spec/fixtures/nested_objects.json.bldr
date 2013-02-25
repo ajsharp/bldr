@@ -1,8 +1,8 @@
 
 object :person => bert do
   attributes :name, :age
-  attribute :name_age do
-    "#{name} #{age}"
+  attribute :name_age do |person|
+    "#{person.name} #{person.age}"
   end
 
   object :friend => ernie do

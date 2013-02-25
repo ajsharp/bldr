@@ -60,10 +60,20 @@ describe "Using Bldr with a sinatra app" do
       @person = Person.new('bert', 99)
       bldr :'fixtures/ivar'
     end
+
+    get '/nested_ivars' do
+      @person = Person.new('bert', 99)
+      bldr :'fixtures/nested_ivars'
+    end
   end
 
   it 'passes ivars through to the template' do
     response = Rack::MockRequest.new(TestApp).get('/ivar')
+    decode(response.body).should == {'person' => {'name' => 'bert', 'age' => 99}}
+  end
+
+  it 'makes ivars available in nested objects' do
+    response = Rack::MockRequest.new(TestApp).get('/nested_ivars')
     decode(response.body).should == {'person' => {'name' => 'bert', 'age' => 99}}
   end
 

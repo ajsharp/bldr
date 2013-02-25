@@ -3,6 +3,8 @@ module Bldr
 
   class Node
 
+    PROTECTED_IVARS = [:@current_object, :@result, :@parent, :@opts, :@views, :@locals]
+
     attr_reader :current_object, :result, :parent, :opts, :views, :locals
 
     # Initialize a new Node instance.
@@ -17,6 +19,8 @@ module Bldr
     #
     #
     # @param [Object] value an object to serialize.
+    # @param [Hash] opts
+    # @option [Object] opts :parent used to copy instance variables into self
     def initialize(value = nil, opts = {}, &block)
       @current_object = value
       @opts           = opts
@@ -24,11 +28,24 @@ module Bldr
       @views          = opts[:views]
       @locals         = opts[:locals]
       # Storage hash for all descendant nodes
-      @result  = {}
+      @result         = {}
 
-      instance_eval(&block) if block_given?
+      copy_instance_variables_from(opts[:parent]) if opts[:parent]
+
+      if block_given?
+        if value && block.arity > 0
+          instance_exec(value, &block)
+        else
+          instance_eval(&block)
+        end
+      end
     end
-    
+
+    def current_object
+      warn "[DEPRECATION] `current_object` is deprecated. Please use object or collection block varibles instead."
+      @current_object
+    end
+
     # Create and render a node.
     #
     # @example A keyed object
@@ -182,15 +199,15 @@ module Bldr
     #
     # @return [Nil]
     def attributes(*args, &block)
-      if current_object.nil?
+      if @current_object.nil?
         raise(ArgumentError, "No current_object to apply #attributes to.")
       end
 
       args.each do |arg|
         if arg.is_a?(Hash)
-          merge_result!(arg.keys.first, current_object.send(arg.values.first))
+          merge_result!(arg.keys.first, @current_object.send(arg.values.first))
         else
-          merge_result!(arg, current_object.send(arg))
+          merge_result!(arg, @current_object.send(arg))
         end
       end
       self
@@ -199,16 +216,20 @@ module Bldr
     def attribute(*args,&block)
       if block_given?
         raise(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.") if args.size > 1
-        raise(ArgumentError, "You cannot use a block of arity > 0 if current_object is not present.") if block.arity > 0 and current_object.nil?
-        merge_result!(args.first, (block.arity == 1) ? block.call(current_object) : current_object.instance_eval(&block))
+        raise(ArgumentError, "You cannot use a block of arity > 0 if current_object is not present.") if block.arity > 0 and @current_object.nil?
+        if block.arity > 0
+          merge_result! args.first, block.call(@current_object)
+        else
+          merge_result! args.first, block.call
+        end
       else
         case args.size
         when 1 # inferred object
-          raise(ArgumentError, "#attribute can't be used when there is no current_object.") if current_object.nil?
+          raise(ArgumentError, "#attribute can't be used when there is no current_object.") if @current_object.nil?
           if args[0].is_a?(Hash)
-            merge_result!(args[0].keys.first, current_object.send(args[0].values.first))
+            merge_result!(args[0].keys.first, @current_object.send(args[0].values.first))
           else
-            merge_result!(args[0], current_object.send(args[0]))
+            merge_result!(args[0], @current_object.send(args[0]))
           end
         when 2 # static property
           merge_result!(args[0], args[1])
@@ -243,6 +264,17 @@ module Bldr
     end
 
     private
+
+    # Retrieves all instance variables from an object and sets them in the
+    #   current scope.
+    #
+    # @param [Object] object The object to copy instance variables from.
+    def copy_instance_variables_from(object)
+      ivar_names = (object.instance_variables - PROTECTED_IVARS).map(&:to_s)
+      ivar_names.map do |name|
+        instance_variable_set(name, object.instance_variable_get(name))
+      end
+    end
 
     # Determines if an object was passed in with a key pointing to it, or if
     # it was passed in as the "root" of the current object. Essentially, this
