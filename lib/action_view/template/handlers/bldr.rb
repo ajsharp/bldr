@@ -1,6 +1,7 @@
 module ActionView::Template::Handlers
   class Bldr
-    # @return [String] the rendered template string
+    # @param [ActionView::Template] template the template instance
+    # @return [String] the rendered ruby code string to render the template
     def self.call(template, opts = {})
       source = if template.source.empty?
         File.read(template.identifier)
