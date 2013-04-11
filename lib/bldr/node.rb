@@ -7,6 +7,7 @@ module Bldr
 
     # These do not get copied into child nodes. All other instance variables do.
     PROTECTED_IVARS = [:@current_object, :@result, :@parent, :@opts, :@views, :@locals]
+    API_METHODS = [:object, :collection, :attribute, :attributes]
 
     attr_reader :current_object, :result, :parent, :opts, :views, :locals
 
@@ -58,7 +59,7 @@ module Bldr
 
         # Delegate all helper method to @view on this class' metaclass
         if @_helpers && @view
-          (class << self; self; end).def_delegators :@view, *@_helpers.instance_methods
+          (class << self; self; end).def_delegators :@view, *(@_helpers.instance_methods - API_METHODS)
         end
       end
 
