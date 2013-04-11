@@ -1,5 +1,6 @@
 module ActionView::Template::Handlers
   class Bldr
+
     # @param [ActionView::Template] template the template instance
     # @return [String] the rendered ruby code string to render the template
     def self.call(template, opts = {})
@@ -10,12 +11,13 @@ module ActionView::Template::Handlers
       end
 
       %{
-        node = ::Bldr::Node.new(nil, parent: self) {
+        node = ::Bldr::Node.new(nil, parent: self, root: true) {
           #{source}
         }
         MultiJson.encode node.result
       }
     end
+
   end
 end
 
