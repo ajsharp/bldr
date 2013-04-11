@@ -163,6 +163,19 @@ module Bldr
   end
 
   describe Node, "#object" do
+    it 'renders the object structure for a nil object' do
+      node = Node.new do
+        object :person => nil do
+          attributes :name
+        end
+        attribute(:foo) { "bar" }
+      end
+      node.result.should == {
+        person: nil,
+        foo: 'bar'
+      }
+    end
+
     it 'is passes block the block variable to the block' do
       denver = Person.new('John Denver')
       node = Node.new do
@@ -231,7 +244,6 @@ module Bldr
         end
       end
 
-
       describe "#attributes" do
         describe "when an object key is passed a null value" do
           subject {
@@ -250,13 +262,14 @@ module Bldr
             }.not_to raise_error(ArgumentError, ERROR_MESSAGES[:attributes_inferred_missing])
           end
 
-          its(:result) { should == {} }
+          its(:result) { should == {:person => nil} }
         end
 
         it "renders each argument against the inferred object" do
           node = wrap { attributes(:name, :age) }
           node.result.should == {:person => {:name => 'alex', :age => 25}}
         end
+
         it "renders nil attributes" do
           node = node_wrap do
             object :person => Person.new('alex') do
@@ -266,9 +279,7 @@ module Bldr
 
           node.result.should == {:person => {:name => 'alex', :age => nil}}
         end
-
       end
-
     end
 
     describe "embedded objects" do
