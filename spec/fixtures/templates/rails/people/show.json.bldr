@@ -1,0 +1,7 @@
+
+attribute(:id) { params[:id] }
+attribute(:name) { @person.name }
+
+if params[:use_boss_helper]
+  attribute(:boss) { boss?(@person) }
+end
