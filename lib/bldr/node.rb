@@ -1,11 +1,16 @@
+require 'forwardable'
 
 module Bldr
 
   class Node
+    extend Forwardable
 
     PROTECTED_IVARS = [:@current_object, :@result, :@parent, :@opts, :@views, :@locals]
 
     attr_reader :current_object, :result, :parent, :opts, :views, :locals
+
+    # @!attribute [r] request params from a rails or sinatra controller
+    attr_reader :params
 
     # Initialize a new Node instance.
     #
@@ -20,6 +25,9 @@ module Bldr
     #
     # @param [Object] value an object to serialize.
     # @param [Hash] opts
+    # @option opts [Object] :parent The parent object is used to copy instance variables
+    #   into each node in the node tree.
+    # @option opts [Boolean] :root indicates whether this is the root node or not
     # @option [Object] opts :parent used to copy instance variables into self
     def initialize(value = nil, opts = {}, &block)
       @current_object = value
@@ -30,7 +38,34 @@ module Bldr
       # Storage hash for all descendant nodes
       @result         = {}
 
-      copy_instance_variables_from(opts[:parent]) if opts[:parent]
+      # opts[:parent] will only get set to an ActionView::Base instance
+      # when rails renders a bldr template. This logic doesn't belong here,
+      # and there's a concept to extracted here.
+      #
+      # The upshot of initializing the root node like this is that all child
+      # nodes will have access to rails helper methods. This is necessary
+      # due to the way bldr makes judicious use of instance_eval.
+      #
+      # @todo refactor this
+      if opts[:root] && @parent
+        @view     = @parent
+
+        # ActionView::Base instances carry a method called helpers,
+        # which is a module that contains helper methods available in a rails
+        # controller.
+        @_helpers = @parent.helpers if @parent.respond_to?(:helpers)
+
+        # Delegate all helper method to @view on this class' metaclass
+        if @_helpers && @view
+          (class << self; self; end).def_delegators :@view, *@_helpers.instance_methods
+        end
+      end
+
+      if @parent && @parent.respond_to?(:params)
+        @params = @parent.params
+      end
+
+      copy_instance_variables(@parent) if @parent
 
       if block_given?
         if value && block.arity > 0
@@ -160,7 +195,7 @@ module Bldr
       else
         @result = massage_value(vals)
       end
-        
+
       self
     end
 
@@ -246,7 +281,7 @@ module Bldr
     #   object :person => dude do
     #     template "path/to/template"
     #   end
-    # 
+    #
     # @example Using locals
     #   object :person => dude do
     #     template "path/to/template", :locals => {:foo => 'bar'}
@@ -269,7 +304,7 @@ module Bldr
     #   current scope.
     #
     # @param [Object] object The object to copy instance variables from.
-    def copy_instance_variables_from(object)
+    def copy_instance_variables(object)
       ivar_names = (object.instance_variables - PROTECTED_IVARS).map(&:to_s)
       ivar_names.map do |name|
         instance_variable_set(name, object.instance_variable_get(name))
@@ -285,7 +320,7 @@ module Bldr
     def keyed_object?(obj)
       obj.respond_to?(:keys)
     end
-    
+
     def find_template(template)
       path = []
       path << views if views
@@ -312,6 +347,6 @@ module Bldr
         val
       end
     end
-    
+
   end
 end
