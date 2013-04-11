@@ -5,6 +5,7 @@ module Bldr
   class Node
     extend Forwardable
 
+    # These do not get copied into child nodes. All other instance variables do.
     PROTECTED_IVARS = [:@current_object, :@result, :@parent, :@opts, :@views, :@locals]
 
     attr_reader :current_object, :result, :parent, :opts, :views, :locals
