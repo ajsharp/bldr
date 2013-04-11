@@ -1,3 +1,4 @@
 .rspec
 Gemfile.lock
 pkg
+/log
