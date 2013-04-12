@@ -131,12 +131,11 @@ module Bldr
           value = nil
         end
 
-        # Short circuit here if the object passed in pointed
-        # at a nil value. There's some debate about how this
-        # should behave by default -- should it build the keyspace,
-        # pointing a null value, or should it leave the key out.
-        # With this implementation, it leaves the keyspace out.
-        return nil if value.nil? and keyed_object?(base)
+        # handle nil objects
+        if value.nil? && keyed_object?(base)
+          merge_result!(key, nil)
+          return self
+        end
 
         node  = Node.new(value, opts.merge(:parent => self), &block)
         merge_result!(key, node.result)
