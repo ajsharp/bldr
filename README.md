@@ -3,11 +3,52 @@
 
 # Bldr
 
-Bldr is a minimalist templating library that provides a simple DSL for generating
-json documents from ruby objects. It currently supports Sinatra out of
-the box -- Rails 3 support is planned for the near future.
+Bldr is a minimalist templating DSL that provides a simple syntax for generating
+json documents from ruby objects. Bldr supports Sinatra and Rails
+3.2 (3.0 and 3.1 may work, but have not been tested).
 
-If you would like to contribute, pull requests with specs are warmly accepted :)
+With bldr you can generate either the simplest or most complex json
+documents:
+
+```ruby
+# app/views/posts/index
+
+collection @posts do |post|
+  attributes :title, :body, :created_at, :slug
+  
+  object :author => post.author do |author|
+    attribute(:name) { author.display_name }
+  end
+
+  collection :comments => post.comments do |comment|
+    attribute :spamminess
+    attribute :created_at
+    attribute(:body) do
+      xss_filter(comment.body)
+    end
+  end
+end
+```
+
+This would output the following json document:
+
+```json
+[
+  {
+    "title": "Some title",
+    "body": "blah blah",
+    "slug": "some-title",
+    "created_at": "2013-04-11T15:46:17-07:00",
+    "author": {
+      "name": "Joe Author"
+    }
+    "comments": [
+      {"spamminess": 1.0, "created_at": "2013-04-11T15:46:17-07:00",
+      "body": "a comment"}
+    ]
+  }
+]
+```
 
 ## Why
 
@@ -15,18 +56,27 @@ If you're building an API, `Model#to_json` just doesn't cut it. Besides the JSON
 representation of your models arguably being a presentation concern, trying
 to cram all of this logic into an `#as_json` method quickly turns into pure chaos.
 
-There are other json templating libraries available -- [rabl](http://github.com/nesquena/rabl) being the most popular -- but I wasn't satisfied with any of the DSL's, so I created Bldr.
+There are other json templating libraries available such as
+[rabl](https://github.com/nesquena/rabl) or [json_builder](https://github.com/dewski/json_builder).
+Bldr is in the same vein as these libraries, but with a simpler synxtax.
 
-## Features
+## How-to & Examples
 
-* Simple json templating DSL
-* Uses Tilt's built-in rendering and template caching for better performance
-* Partials
+See [Examples on the
+wiki](https://github.com/ajsharp/bldr/wiki/Documentation-&-Examples)
+for more.
 
 ## Installation
 
-There are two ways to use Bldr in your Sinatra app, depending on whether
-you are using Sinatra's classic or module application style:
+In your gemfile:
+
+```ruby
+gem 'bldr'
+```
+
+## Configuration
+
+### Sinatra
 
 ```ruby
 
@@ -131,7 +181,6 @@ au BufRead,BufNewFile *.bldr set filetype=ruby
 
 ## TODO
 
-* Rails 3 support.  An attempt for this was made for this but was reverted in e1cfd7fcbe130b316d95773d8c73ece4e247200e.  Feel free to take a shot.
 * XML support
 
 ## Acknowledgements
