@@ -11,7 +11,7 @@ With bldr you can generate either the simplest or most complex json
 documents:
 
 ```ruby
-# app/views/posts/index
+# app/views/posts/index.json.bldr
 
 collection @posts do |post|
   attributes :title, :body, :created_at, :slug
