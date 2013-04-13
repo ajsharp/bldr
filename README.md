@@ -63,11 +63,10 @@ There are other json templating libraries available such as
 [rabl](https://github.com/nesquena/rabl) or [json_builder](https://github.com/dewski/json_builder).
 Bldr is in the same vein as these libraries, but with a simpler synxtax.
 
-## How-to & Examples
+## Usage & Examples
 
-See [Examples on the
-wiki](https://github.com/ajsharp/bldr/wiki/Documentation-&-Examples)
-for more.
+See [Examples on the wiki](https://github.com/ajsharp/bldr/wiki/Documentation-&-Examples)
+for documentation and usage examples.
 
 ## Installation
 
@@ -79,7 +78,10 @@ gem 'bldr'
 
 ## Configuration
 
-### Sinatra
+No additional configuration is required for rails applications.
+
+For sinatra apps, dependening on whether you're using a modular or classic
+application style, do one of the following:
 
 ```ruby
 
@@ -100,10 +102,6 @@ class MyApp < Sinatra::Base
   register Sinatra::Bldr
 end
 ```
-
-## Usage
-
-See the [Documentation & Examples](https://github.com/ajsharp/bldr/wiki/Documentation-&-Examples) page on the wiki.
 
 ## Deprecations & Breaking Changes
 
