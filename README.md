@@ -176,10 +176,20 @@ See [941608e](https://github.com/ajsharp/bldr/commit/d0bfbd8) and [d0bfbd8](http
 
 ## Editor Syntax Support
 
-To get proper syntax highlighting in vim, add this line to your .vimrc:
+### Vim
+
+Add this line to your .vimrc:
 
 ```
 au BufRead,BufNewFile *.bldr set filetype=ruby
+```
+
+### Emacs
+
+Add this to your `~/.emacs.d/init.el`:
+
+```
+(add-to-list 'auto-mode-alist '("\\.bldr$" . ruby-mode))
 ```
 
 ## TODO
