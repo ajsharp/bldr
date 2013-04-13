@@ -7,8 +7,7 @@ Bldr is a minimalist templating DSL that provides a simple syntax for generating
 json documents from ruby objects. Bldr supports Sinatra and Rails
 3.2 (3.0 and 3.1 may work, but have not been tested).
 
-With bldr you can generate either the simplest or most complex json
-documents:
+With bldr you can generate both simple and complex json documents:
 
 ```ruby
 # app/views/posts/index.json.bldr
