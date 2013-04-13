@@ -7,6 +7,9 @@ module Bldr
 
     # These do not get copied into child nodes. All other instance variables do.
     PROTECTED_IVARS = [:@current_object, :@result, :@parent, :@opts, :@views, :@locals]
+
+    # List of bldr public api method. So we don't overwrite them when we do
+    # crazy ruby metaprogramming when we build nodes.
     API_METHODS = [:object, :collection, :attribute, :attributes]
 
     attr_reader :current_object, :result, :parent, :opts, :views, :locals
@@ -57,7 +60,8 @@ module Bldr
         # controller.
         @_helpers = @parent.helpers if @parent.respond_to?(:helpers)
 
-        # Delegate all helper method to @view on this class' metaclass
+        # Delegate all helper methods, minus those with the same name as any
+        # bldr api methods to @view on this object's metaclass
         if @_helpers && @view
           (class << self; self; end).def_delegators :@view, *(@_helpers.instance_methods - API_METHODS)
         end
