@@ -41,10 +41,13 @@ This would output the following json document:
     "created_at": "2013-04-11T15:46:17-07:00",
     "author": {
       "name": "Joe Author"
-    }
+    },
     "comments": [
-      {"spamminess": 1.0, "created_at": "2013-04-11T15:46:17-07:00",
-      "body": "a comment"}
+      {
+        "spamminess": 1.0,
+        "created_at": "2013-04-11T15:46:17-07:00",
+        "body": "a comment"
+      }
     ]
   }
 ]
