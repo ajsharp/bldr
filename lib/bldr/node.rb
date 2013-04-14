@@ -60,10 +60,7 @@ module Bldr
 
       copy_instance_variables(@parent) if @parent
       delegate_helpers if @view
-
-      if @parent && @parent.respond_to?(:params)
-        @params = @parent.params
-      end
+      assign_params if @parent
 
       if block_given?
         if value && block.arity > 0
@@ -320,6 +317,11 @@ module Bldr
       if @_helpers
         (class << self; self; end).def_delegators :@view, *(@_helpers.instance_methods - API_METHODS)
       end
+    end
+
+    # Assigns the params attribute from the parent.
+    def assign_params
+      @params = @parent.params if @parent.respond_to?(:params)
     end
 
     # Determines if an object was passed in with a key pointing to it, or if
