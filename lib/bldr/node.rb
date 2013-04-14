@@ -40,12 +40,11 @@ module Bldr
       @parent         = opts[:parent]
       @views          = opts[:views]
       @locals         = opts[:locals]
-      # Storage hash for all descendant nodes
-      @result         = {}
+      @result         = {} # Storage hash for all descendant nodes
 
       # opts[:parent] will only get set to an ActionView::Base instance
       # when rails renders a bldr template. This logic doesn't belong here,
-      # and there's a concept to extracted here.
+      # and there's a concept to be extracted here.
       #
       # The upshot of initializing the root node like this is that all child
       # nodes will have access to rails helper methods. This is necessary
