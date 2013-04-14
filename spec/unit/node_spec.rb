@@ -7,6 +7,46 @@ ERROR_MESSAGES = { :attribute_lambda_one_argument              => "You may only 
   :attributes_inferred_missing                => "No current_object to apply #attributes to." }
 
 module Bldr
+  describe Node, 'delegating helper methods' do
+    before do
+      # mock version of a module of methods that would be attached
+      # to an ActionView::Base instance
+      helpers = Module.new do
+        def my_helper
+        end
+
+        def helper_with_args_and_block(one, two)
+          yield if block_given?
+        end
+      end
+
+      @view = mock('action view template', helpers: helpers)
+      @node = Node.new(nil, root: true, parent: @view)
+    end
+
+    it 'delegates the methods to the parent object' do
+      @view.should_receive(:my_helper)
+      @node.my_helper
+    end
+
+    it 'assigns opts[:parent] as a @view instance variable' do
+      @node.instance_variable_get(:@view).should == @view
+    end
+
+    it 'delegates arguments and blocks to the parent' do
+      lam = lambda { }
+      @view.should_receive(:helper_with_args_and_block).with(1, 2, lam)
+      @node.helper_with_args_and_block(1, 2, lam)
+    end
+
+    it 'defines helper methods on a per-instance basis' do
+      @node.methods.should include :my_helper
+
+      new_parent = Struct.new(nil).new
+      Node.new(nil, root: true, parent: new_parent).methods.should_not include :my_helper
+    end
+  end
+
   describe Node, "#attributes" do
     let(:person) {
       Person.new('john', 25)
