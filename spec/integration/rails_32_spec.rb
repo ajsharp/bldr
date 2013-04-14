@@ -54,7 +54,7 @@ describe 'a template for a rails controller' do
     get('/people').status.should == 200
   end
 
-  it 'returns a json thing' do
+  it 'returns a json response body' do
     decode(get('/people').body).should == [
       {'name' => 'Dave Chappelle'},
       {'name' => 'Chris Rock'}

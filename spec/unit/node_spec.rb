@@ -13,6 +13,7 @@ module Bldr
       # to an ActionView::Base instance
       helpers = Module.new do
         def my_helper
+          'my helper'
         end
 
         def helper_with_args_and_block(one, two)
@@ -20,13 +21,26 @@ module Bldr
         end
       end
 
-      @view = mock('action view template', helpers: helpers)
+      # set up a mock ActionView::Base instance
+      MockActionView = Struct.new(:helpers)
+      @view = MockActionView.new(helpers)
+      @view.extend(helpers)
+
       @node = Node.new(nil, root: true, parent: @view)
     end
 
     it 'delegates the methods to the parent object' do
       @view.should_receive(:my_helper)
       @node.my_helper
+    end
+
+    it 'gives access to helper methods to child nodes' do
+      node = Node.new(nil, root: true, parent: @view) do
+        object(:foo => Object.new) do
+          attribute(:bar) { my_helper }
+        end
+      end
+      node.result.should == {foo: {bar: 'my helper'}}
     end
 
     it 'assigns opts[:parent] as a @view instance variable' do

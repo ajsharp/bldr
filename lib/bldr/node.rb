@@ -53,25 +53,18 @@ module Bldr
       #
       # @todo refactor this
       if opts[:root] && @parent
-        @view     = @parent
-
-        # ActionView::Base instances carry a method called helpers,
-        # which is a module that contains helper methods available in a rails
-        # controller.
-        @_helpers = @parent.helpers if @parent.respond_to?(:helpers)
-
-        # Delegate all helper methods, minus those with the same name as any
-        # bldr api methods to @view on this object's metaclass
-        if @_helpers && @view
-          (class << self; self; end).def_delegators :@view, *(@_helpers.instance_methods - API_METHODS)
-        end
+        # assign @parent to @view so it will be copied down to each child nod
+        # @parent is in PROTECTED_IVARS and won't be copied. This effectively
+        # gives all child nodes access to helper methods passed into the parent
+        @view = @parent
       end
+
+      copy_instance_variables(@parent) if @parent
+      delegate_helpers if @view
 
       if @parent && @parent.respond_to?(:params)
         @params = @parent.params
       end
-
-      copy_instance_variables(@parent) if @parent
 
       if block_given?
         if value && block.arity > 0
@@ -313,6 +306,20 @@ module Bldr
       ivar_names = (object.instance_variables - PROTECTED_IVARS).map(&:to_s)
       ivar_names.map do |name|
         instance_variable_set(name, object.instance_variable_get(name))
+      end
+    end
+
+    # Delegate helper methods on the @view to @view
+    def delegate_helpers
+      # ActionView::Base instances carry a method called helpers,
+      # which is a module that contains helper methods available in a rails
+      # controller.
+      @_helpers = @view.helpers if @view.respond_to?(:helpers)
+
+      # Delegate all helper methods, minus those with the same name as any
+      # bldr api methods to @view via this object's metaclass
+      if @_helpers
+        (class << self; self; end).def_delegators :@view, *(@_helpers.instance_methods - API_METHODS)
       end
     end
 
