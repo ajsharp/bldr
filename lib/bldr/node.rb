@@ -202,28 +202,7 @@ module Bldr
     #
     # @example Attribute aliasing
     #   object :person => dude do
-    #     attributes :surname => :last_name
-    #   end
-    #
-    # @example Dynamic attributes (explicit object context)
-    #   object :person => employee do
-    #     collection :colleagues => employee.colleagues do |colleague|
-    #       attribute :isBoss do |colleague|
-    #         employee.works_with?(colleague) && colleague.admin?
-    #       end
-    #     end
-    #   end
-    #
-    # @example Dynamic attributes (implicit object context)
-    #   object :person => dude do
-    #     collection :colleagues => employee.colleagues do |colleague|
-    #       attribute :rank do
-    #         # method called on colleague
-    #         if admin? && superior_to?(employee)
-    #           "High Up"
-    #         end
-    #       end
-    #     end
+    #     attributes :surname => :last_name # invokes dude.last_name
     #   end
     #
     # @return [Nil]
@@ -242,25 +221,61 @@ module Bldr
       self
     end
 
-    def attribute(*args,&block)
+    # @example Dynamic attributes
+    #   object :person => employee do
+    #     collection :colleagues => employee.colleagues do |colleague|
+    #       attribute :isBoss do
+    #         employee.works_with?(colleague) && colleague.admin?
+    #       end
+    #     end
+    #   end
+    #
+    def attribute(*args, &block)
       if block_given?
-        raise(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.") if args.size > 1
-        raise(ArgumentError, "You cannot use a block of arity > 0 if current_object is not present.") if block.arity > 0 and @current_object.nil?
+        # e.g. attribute(:one, :two) { "value" }
+        if args.size > 1
+          raise(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.")
+        end
+
+        # e.g.
+        # object do
+        #   attribute { 'value' }
+        # end
+        if block.arity > 0 && @current_object.nil?
+          raise(ArgumentError, "You cannot use a block of arity > 0 if current_object is not present.")
+        end
+
         if block.arity > 0
+          # object(person: @person) do
+          #   attribute(:name) { |person| person.name }
+          # end
           merge_result! args.first, block.call(@current_object)
         else
+          # object(person: @person) do
+          #   attribute(:name) # i.e. @person.name
+          # end
           merge_result! args.first, block.call
         end
       else
         case args.size
-        when 1 # inferred object
+        when 1
+          # object do
+          #   attribute(:name)
+          # end
           raise(ArgumentError, "#attribute can't be used when there is no current_object.") if @current_object.nil?
           if args[0].is_a?(Hash)
+            # object(person: @person) do
+            #   attribute :key => :display_name # i.e. @person.display_name
+            # end
             merge_result!(args[0].keys.first, @current_object.send(args[0].values.first))
           else
+            # object(person: @person) do
+            #   attribute :name
+            # end
             merge_result!(args[0], @current_object.send(args[0]))
           end
-        when 2 # static property
+        when 2
+          # attribute :name, @person.name
           merge_result!(args[0], args[1])
         else
           raise(ArgumentError, "You cannot pass more than two arguments to #attribute.")
