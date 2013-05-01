@@ -5,6 +5,7 @@ end
 
 require 'multi_json'
 require 'bldr/node'
+require 'bldr/railtie' if defined?(Rails)
 
 if defined?(Tilt)
   require 'bldr/template'

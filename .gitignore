@@ -1,3 +1,5 @@
 .rspec
 Gemfile.lock
 pkg
+/log
+coverage

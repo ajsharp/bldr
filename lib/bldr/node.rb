@@ -1,11 +1,21 @@
+require 'forwardable'
 
 module Bldr
 
   class Node
+    extend Forwardable
 
+    # These do not get copied into child nodes. All other instance variables do.
     PROTECTED_IVARS = [:@current_object, :@result, :@parent, :@opts, :@views, :@locals]
 
+    # List of bldr public api method. So we don't overwrite them when we do
+    # crazy ruby metaprogramming when we build nodes.
+    API_METHODS = [:object, :collection, :attribute, :attributes]
+
     attr_reader :current_object, :result, :parent, :opts, :views, :locals
+
+    # @!attribute [r] request params from a rails or sinatra controller
+    attr_reader :params
 
     # Initialize a new Node instance.
     #
@@ -20,6 +30,9 @@ module Bldr
     #
     # @param [Object] value an object to serialize.
     # @param [Hash] opts
+    # @option opts [Object] :parent The parent object is used to copy instance variables
+    #   into each node in the node tree.
+    # @option opts [Boolean] :root indicates whether this is the root node or not
     # @option [Object] opts :parent used to copy instance variables into self
     def initialize(value = nil, opts = {}, &block)
       @current_object = value
@@ -27,10 +40,27 @@ module Bldr
       @parent         = opts[:parent]
       @views          = opts[:views]
       @locals         = opts[:locals]
-      # Storage hash for all descendant nodes
-      @result         = {}
+      @result         = {} # Storage hash for all descendant nodes
 
-      copy_instance_variables_from(opts[:parent]) if opts[:parent]
+      # opts[:parent] will only get set to an ActionView::Base instance
+      # when rails renders a bldr template. This logic doesn't belong here,
+      # and there's a concept to be extracted here.
+      #
+      # The upshot of initializing the root node like this is that all child
+      # nodes will have access to rails helper methods. This is necessary
+      # due to the way bldr makes judicious use of instance_eval.
+      #
+      # @todo refactor this
+      if opts[:root] && @parent
+        # assign @parent to @view so it will be copied down to each child nod
+        # @parent is in PROTECTED_IVARS and won't be copied. This effectively
+        # gives all child nodes access to helper methods passed into the parent
+        @view = @parent
+      end
+
+      copy_instance_variables(@parent) if @parent
+      delegate_helpers if @view
+      assign_params if @parent
 
       if block_given?
         if value && block.arity > 0
@@ -172,28 +202,7 @@ module Bldr
     #
     # @example Attribute aliasing
     #   object :person => dude do
-    #     attributes :surname => :last_name
-    #   end
-    #
-    # @example Dynamic attributes (explicit object context)
-    #   object :person => employee do
-    #     collection :colleagues => employee.colleagues do |colleague|
-    #       attribute :isBoss do |colleague|
-    #         employee.works_with?(colleague) && colleague.admin?
-    #       end
-    #     end
-    #   end
-    #
-    # @example Dynamic attributes (implicit object context)
-    #   object :person => dude do
-    #     collection :colleagues => employee.colleagues do |colleague|
-    #       attribute :rank do
-    #         # method called on colleague
-    #         if admin? && superior_to?(employee)
-    #           "High Up"
-    #         end
-    #       end
-    #     end
+    #     attributes :surname => :last_name # invokes dude.last_name
     #   end
     #
     # @return [Nil]
@@ -212,25 +221,61 @@ module Bldr
       self
     end
 
-    def attribute(*args,&block)
+    # @example Dynamic attributes
+    #   object :person => employee do
+    #     collection :colleagues => employee.colleagues do |colleague|
+    #       attribute :isBoss do
+    #         employee.works_with?(colleague) && colleague.admin?
+    #       end
+    #     end
+    #   end
+    #
+    def attribute(*args, &block)
       if block_given?
-        raise(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.") if args.size > 1
-        raise(ArgumentError, "You cannot use a block of arity > 0 if current_object is not present.") if block.arity > 0 and @current_object.nil?
+        # e.g. attribute(:one, :two) { "value" }
+        if args.size > 1
+          raise(ArgumentError, "You may only pass one argument to #attribute when using the block syntax.")
+        end
+
+        # e.g.
+        # object do
+        #   attribute { 'value' }
+        # end
+        if block.arity > 0 && @current_object.nil?
+          raise(ArgumentError, "You cannot use a block of arity > 0 if current_object is not present.")
+        end
+
         if block.arity > 0
+          # object(person: @person) do
+          #   attribute(:name) { |person| person.name }
+          # end
           merge_result! args.first, block.call(@current_object)
         else
+          # object(person: @person) do
+          #   attribute(:name) # i.e. @person.name
+          # end
           merge_result! args.first, block.call
         end
       else
         case args.size
-        when 1 # inferred object
+        when 1
+          # object do
+          #   attribute(:name)
+          # end
           raise(ArgumentError, "#attribute can't be used when there is no current_object.") if @current_object.nil?
           if args[0].is_a?(Hash)
+            # object(person: @person) do
+            #   attribute :key => :display_name # i.e. @person.display_name
+            # end
             merge_result!(args[0].keys.first, @current_object.send(args[0].values.first))
           else
+            # object(person: @person) do
+            #   attribute :name
+            # end
             merge_result!(args[0], @current_object.send(args[0]))
           end
-        when 2 # static property
+        when 2
+          # attribute :name, @person.name
           merge_result!(args[0], args[1])
         else
           raise(ArgumentError, "You cannot pass more than two arguments to #attribute.")
@@ -268,11 +313,30 @@ module Bldr
     #   current scope.
     #
     # @param [Object] object The object to copy instance variables from.
-    def copy_instance_variables_from(object)
+    def copy_instance_variables(object)
       ivar_names = (object.instance_variables - PROTECTED_IVARS).map(&:to_s)
       ivar_names.map do |name|
         instance_variable_set(name, object.instance_variable_get(name))
       end
+    end
+
+    # Delegate helper methods on the @view to @view
+    def delegate_helpers
+      # ActionView::Base instances carry a method called helpers,
+      # which is a module that contains helper methods available in a rails
+      # controller.
+      @_helpers = @view.helpers if @view.respond_to?(:helpers)
+
+      # Delegate all helper methods, minus those with the same name as any
+      # bldr api methods to @view via this object's metaclass
+      if @_helpers
+        (class << self; self; end).def_delegators :@view, *(@_helpers.instance_methods - API_METHODS)
+      end
+    end
+
+    # Assigns the params attribute from the parent.
+    def assign_params
+      @params = @parent.params if @parent.respond_to?(:params)
     end
 
     # Determines if an object was passed in with a key pointing to it, or if

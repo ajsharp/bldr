@@ -11,6 +11,19 @@ describe "Using Bldr with a sinatra app" do
     disable :show_exceptions
     enable  :raise_errors
 
+    get '/people/:id' do
+      @alex = Person.new("alex", 25)
+
+      tpl = %{
+object(:person => @alex) do
+  attribute(:id) { params['id'] }
+  attribute :name
+end
+      }
+      status 200
+      bldr tpl
+    end
+
     get '/' do
       alex =  Person.new("alex", 25)
       tpl = <<-RUBY
@@ -65,6 +78,13 @@ describe "Using Bldr with a sinatra app" do
       @person = Person.new('bert', 99)
       bldr :'fixtures/nested_ivars'
     end
+  end
+
+  it 'has access to the params hash in bldr templates' do
+    response = Rack::MockRequest.new(TestApp).get('/people/123')
+    decode(response.body).should == {
+      'person' => { 'id' => '123', 'name' => 'alex'}
+    }
   end
 
   it 'passes ivars through to the template' do

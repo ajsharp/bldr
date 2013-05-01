@@ -1,0 +1,4 @@
+
+collection @people do
+  attribute :name
+end
