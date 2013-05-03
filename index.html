@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Bldr by ajsharp</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Bldr</h1>
+        <p>A minimalist JSON templating DSL for Rails and Sinatra</p>
+
+        <p class="view"><a href="https://github.com/ajsharp/bldr">View the Project on GitHub <small>ajsharp/bldr</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/ajsharp/bldr/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/ajsharp/bldr/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/ajsharp/bldr">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p>Bldr is a tiny templating library for generating JSON responses for Rails and Sinatra applications.</p>
+
+<p>Bldr is very concise, containing only four core methods:</p>
+
+<ul>
+<li><code>object</code></li>
+<li><code>collection</code></li>
+<li><code>attribute</code></li>
+<li><code>attributes</code></li>
+</ul><p>These four methods allow a great deal of flexibility and power in constructing JSON responses.</p>
+
+<h2>Installation</h2>
+
+<p>In your gemfile:</p>
+
+<div class="highlight"><pre><span class="n">gem</span> <span class="s1">'bldr'</span>
+</pre></div>
+
+<h2>Configuration</h2>
+
+<p>No additional configuration is required for rails applications.</p>
+
+<p>For sinatra apps, dependening on whether you're using a modular or classic
+application style, do one of the following:</p>
+
+<div class="highlight"><pre>
+<span class="c1"># Method 1: Classic style</span>
+
+<span class="nb">require</span> <span class="s1">'sinatra/bldr'</span>
+
+<span class="n">get</span> <span class="s1">'/hello'</span> <span class="k">do</span>
+  <span class="n">bldr</span> <span class="ss">:hello</span>
+<span class="k">end</span>
+
+
+<span class="c1"># Method 2: Modular style</span>
+
+<span class="nb">require</span> <span class="s1">'sinatra/bldr'</span>
+
+<span class="k">class</span> <span class="nc">MyApp</span> <span class="o">&lt;</span> <span class="ss">Sinatra</span><span class="p">:</span><span class="ss">:Base</span>
+  <span class="n">register</span> <span class="ss">Sinatra</span><span class="p">:</span><span class="ss">:Bldr</span>
+<span class="k">end</span>
+</pre></div>
+
+<h2>Why</h2>
+
+<p>If you're building an API, <code>Model#to_json</code> just doesn't cut it. Besides the JSON
+representation of your models arguably being a presentation concern, trying
+to cram all of this logic into an <code>#as_json</code> method quickly turns into pure chaos.</p>
+
+<p>There are other json templating libraries available such as
+<a href="https://github.com/nesquena/rabl">rabl</a> or <a href="https://github.com/dewski/json_builder">json_builder</a>.
+Bldr is in the same vein as these libraries, but with a simpler synxtax.</p>
+
+<h2>Editor Syntax Support</h2>
+
+<h3>Vim</h3>
+
+<p>Add this line to your .vimrc:</p>
+
+<pre><code>au BufRead,BufNewFile *.bldr set filetype=ruby
+</code></pre>
+
+<h3>Emacs</h3>
+
+<p>Add this to your <code>~/.emacs.d/init.el</code>:</p>
+
+<pre><code>(add-to-list 'auto-mode-alist '("\\.bldr$" . ruby-mode))
+</code></pre>
+
+<h2>Copyright</h2>
+
+<p>Copyright (c) 2011-2013 Alex Sharp. See the MIT-LICENSE file for full
+copyright information.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/ajsharp">ajsharp</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-40649704-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
