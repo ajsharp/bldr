@@ -24,6 +24,11 @@ module Bldr
     def precompiled_template(locals)
       data.to_s
     end
+
+    protected
+    def compiled_method(locals_keys)
+      compile_template_method(locals_keys)
+    end
   end
 
   Tilt.register 'bldr', Bldr::Template
