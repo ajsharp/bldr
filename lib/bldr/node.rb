@@ -119,15 +119,15 @@ module Bldr
         if keyed_object?(base)
           key   = base.keys.first
           value = base.values.first
+
+          # handle nil objects
+          if value.nil?
+            merge_result!(key, nil)
+            return self
+          end
         else
           key = base
           value = nil
-        end
-
-        # handle nil objects
-        if value.nil? && keyed_object?(base)
-          merge_result!(key, nil)
-          return self
         end
 
         node  = Node.new(value, opts.merge(:parent => self), &block)
