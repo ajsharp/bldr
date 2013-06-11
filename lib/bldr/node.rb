@@ -7,6 +7,7 @@ module Bldr
 
     # These do not get copied into child nodes. All other instance variables do.
     PROTECTED_IVARS = [:@current_object, :@result, :@parent, :@opts, :@views, :@locals]
+    SINATRA_IVARS = [:@default_layout, :@app, :@template_cache, :@env, :@response]
 
     # List of bldr public api method. So we don't overwrite them when we do
     # crazy ruby metaprogramming when we build nodes.
@@ -314,7 +315,7 @@ module Bldr
     #
     # @param [Object] object The object to copy instance variables from.
     def copy_instance_variables(object)
-      ivar_names = (object.instance_variables - PROTECTED_IVARS).map(&:to_s)
+      ivar_names = (object.instance_variables - PROTECTED_IVARS - SINATRA_IVARS).map(&:to_s)
       ivar_names.map do |name|
         instance_variable_set(name, object.instance_variable_get(name))
       end
