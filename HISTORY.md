@@ -1,3 +1,10 @@
+## 1.0.1
+* #32 Improved `object` syntax
+
+## 1.0.0
+* Full Rails 3 support
+* #31 BREAKING: Properly handle nil objects
+
 ## 0.7.0 (2013-02-24)
 * Full support for instance variables
 * Breaking change: Node#attribute block syntax no longer inherits
