@@ -1,9 +1,9 @@
 ## 1.0.1
-* #32 Improved `object` syntax
+* [#32](https://github.com/ajsharp/bldr/pull/32) Improved `object` syntax
 
 ## 1.0.0
 * Full Rails 3 support
-* #31 BREAKING: Properly handle nil objects
+* [#31](https://github.com/ajsharp/bldr/pull/31) BREAKING: Properly handle nil objects
 
 ## 0.7.0 (2013-02-24)
 * Full support for instance variables
