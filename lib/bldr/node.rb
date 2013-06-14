@@ -109,6 +109,11 @@ module Bldr
     #     object :hobbies => hobbies
     #   end
     #
+    # @example Setting current object
+    #   object @person do
+    #     attributes :id, :name
+    #   end # => {'id' => 1, 'name' => 'john doe'}
+    #
     # @param [Hash, Nil] hash a key/value pair indicating the output key name
     #   and the object to serialize.
     # @param [Proc] block the code block to evaluate
@@ -119,15 +124,22 @@ module Bldr
         if keyed_object?(base)
           key   = base.keys.first
           value = base.values.first
-        else
-          key = base
-          value = nil
-        end
 
-        # handle nil objects
-        if value.nil? && keyed_object?(base)
-          merge_result!(key, nil)
-          return self
+          # handle nil objects
+          if value.nil?
+            merge_result!(key, nil)
+            return self
+          end
+        else
+          # e.g. set the keyspace for an object
+          if base.is_a?(Symbol) || base.is_a?(String)
+            key = base
+            value = nil
+          else
+            # e.g. set current object
+            value = base
+            key = nil
+          end
         end
 
         node  = Node.new(value, opts.merge(:parent => self), &block)
