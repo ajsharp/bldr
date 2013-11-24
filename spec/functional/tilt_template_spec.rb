@@ -1,6 +1,17 @@
 require 'spec_helper'
 
 module Bldr
+  describe '.template' do
+    it 'renders the template passed in' do
+      person = Person.new('jim john', 31)
+      result = Bldr::Template.render('spec/fixtures/tilt_template.bldr', locals: {person: person})
+
+      body = decode(result)
+      body['person']['name'].should == 'jim john'
+      body['person']['age'].should == 31
+    end
+  end
+
   describe 'local variable access' do
     it 'provides access to locals in nested object blocks' do
       Template.new do

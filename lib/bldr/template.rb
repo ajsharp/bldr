@@ -24,6 +24,19 @@ module Bldr
     def precompiled_template(locals)
       data.to_s
     end
+
+    # Helper to render templates outside the context of a rails/sinatra view.
+    #
+    # @param [String] template path to a file name
+    # @param [Hash] opts
+    #
+    # @return [String]
+    def self.render(template, opts = {})
+      scope  = ::Bldr::Node.new
+      locals = opts.delete(:locals) || {}
+      node   = new(template, 1, opts).render(scope, locals)
+      MultiJson.encode(node.result)
+    end
   end
 
   Tilt.register 'bldr', Bldr::Template
